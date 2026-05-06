@@ -88,7 +88,7 @@ watch(searchQuery, (q) => {
   }, 300);
 });
 
-const navigate = (result) => { router.push(`/article/${result.slug}`); close(); };
+const navigate = (result) => { router.push(`/articles/${result.slug}`); close(); };
 const openSearch = async () => { searchOpen.value = true; await nextTick(); searchInput.value?.focus(); };
 const close = () => { searchOpen.value = false; searchQuery.value = ''; searchResults.value = []; };
 

@@ -1,14 +1,16 @@
 // middleware/gate.ts
-export default defineNuxtRouteMiddleware(() => {
+export default defineNuxtRouteMiddleware(async (to) => {
   const user = useSupabaseUser()
-
-  if (!user.value) {
-    return navigateTo('/login')
+  
+  // Give the client a moment to resolve the session 
+  // if we are navigating client-side
+  if (import.meta.client && !user.value) {
+    const client = useSupabaseClient()
+    const { data } = await client.auth.getSession()
+    if (!data.session) return navigateTo('/login')
   }
-
-  // Your two admin emails — same check as before
-  const admins = ['you@email.com', 'other@email.com']
-  if (!admins.includes(user.value.email ?? '')) {
-    return navigateTo('/')
+  
+  if (!user.value && import.meta.server) {
+    return navigateTo('/login')
   }
 })

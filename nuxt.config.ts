@@ -11,11 +11,12 @@ export default defineNuxtConfig({
   modules: [
     ['@nuxtjs/supabase', {
       types: null,
-      redirectOptions: {
-        login: '/login',
-        callback: '/confirm',
-        include: ['/gate', '/gate/*'],
-      },
+      redirect: false
+      // redirectOptions: {
+      //   login: '/login',
+      //   callback: '/confirm',
+      //   include: ['/gate', '/gate/preview/*'],
+      // },
     }],
     '@pinia/nuxt',
   ],

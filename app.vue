@@ -22,7 +22,7 @@ const route = useRoute();
 const hasGlobalError = ref(false)
 
 const shouldHideNav = computed(() =>
-  ['Admin', 'Login', 'ArticlePreview'].includes(route.name as string)
+  ['gate', 'login'].includes(route.name as string)
 );
 
 watch(() => route.fullPath, () => { isMenuOpen.value = false; });
@@ -32,7 +32,6 @@ const markErrored = (event: any) => {
 
   // Log the specific details to the console
   console.error("🔥 Global Error Caught!");
-  console.log("Type:", event.type); // 'error', 'unhandledrejection', or 'app-global-error'
   
   if (event.type === 'unhandledrejection') {
     console.log("Reason:", event.reason); // Detailed promise rejection info
