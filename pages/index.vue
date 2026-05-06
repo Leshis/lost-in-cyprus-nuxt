@@ -186,7 +186,7 @@ const resetFilters = (): void => {
 const handleAction = (loc: Article): void => {
   loc.affiliate_url
     ? window.open(loc.affiliate_url, '_blank', 'noopener,noreferrer')
-    : router.push(`/article/${loc.slug}`)
+    : router.push(`/articles/${loc.slug}`)
 }
 </script>
 
