@@ -1,0 +1,299 @@
+/* ─── 1. GLOBAL VARIABLES ───────────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --color-navy: #1c2a32;
+  --color-gold: #c69f4b;
+  --color-gold-muted: rgba(198, 159, 75, 0.13);
+  /* Add to :root in main.css */
+  --color-copper: #b57b52;
+  --color-copper-dark: #a06a45;
+  --color-copper-shadow: rgba(181, 123, 82, 0.2);
+  --color-copper-focus: rgba(181, 123, 82, 0.15);
+  --color-red: #c62828;
+  --color-green: #2e7d32;
+  --color-text-dark: #2c3e50;
+  --color-text-mid: #374151;
+  --color-text-muted: #718096;
+  --border-form: #edf2f7;
+
+  /* Backgrounds */
+  --bg-warm: #f8f6f0;
+  --bg-warm-light: #fdfcf8;
+  --bg-card: #ffffff;
+
+  /* Text */
+  --text-primary: #1a1a1a;
+  --text-body: #666666;
+  --text-muted: #999999;
+  --text-white: #ffffff;
+
+  /* Borders */
+  --border-light: #eeeeee;
+  --border-mid: #e0e0e0;
+
+  /* Shadows */
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lift: -5px 0 15px rgba(0, 0, 0, 0.05);
+
+  /* Radii */
+  --radius: 12px;
+  --radius-sm: 6px;
+  --radius-pill: 20px;
+
+  /* Legacy / kept for compatibility */
+  --primary-blue: #0088ff;
+  --dark-bg: #333;
+  --light-bg: #f4f4f4;
+}
+
+
+/* ─── 2. RESET ──────────────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
+/* ─── 3. BASE ───────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--bg-warm);
+  color: var(--text-primary);
+}
+
+
+/* ─── 4. LAYOUT ─────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ─── 5. COMPONENTS ─────────────────────────────────────────────────────── */
+
+/* Card — structural shell only, specifics stay in components */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* Category tag — gold uppercase label used across cards and articles */
+.category-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Badge — muted meta info */
+.badge {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* ─── 6. FORMS ──────────────────────────────────────────────────────────── */
+
+/* Field wrapper — vertical stack with gap */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Two-column row of fields */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Label */
+.form-label,
+.field>label {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--color-text-dark);
+  letter-spacing: 0.03em;
+}
+
+/* All text inputs, selects, textareas */
+.form-input,
+.field input,
+.field select,
+.field textarea {
+  padding: 0.9rem;
+  width: 100%;
+  border: 2px solid var(--border-form);
+  border-radius: 8px;
+  font-family: Inter, sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.2s ease-in-out, background 0.2s ease-in-out;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.form-input:focus,
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--color-copper);
+  background: #fff;
+}
+
+/* Hint text below a field */
+.hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* Required asterisk */
+.required-star {
+  color: var(--color-red);
+  margin-left: 2px;
+}
+
+/* Feedback messages (success/error below forms) */
+.feedback {
+  text-align: center;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+}
+
+.feedback.success {
+  background: #e8f5e9;
+  color: var(--color-green);
+}
+
+.feedback.error {
+  background: #ffebee;
+  color: var(--color-red);
+}
+
+/* ─── 7. BUTTONS ────────────────────────────────────────────────────────── */
+
+/* Base shared by all buttons */
+.btn,
+[class^="btn-"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.2rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+[class^="btn-"]:disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Primary — copper fill, used for main form submits */
+.btn-primary {
+  background: var(--color-copper);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 6px var(--color-copper-shadow);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-copper-dark);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: #cbd5e0;
+}
+
+/* Ghost — grey outline, used for Save as Draft */
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-mid);
+  border-color: #9ca3af;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+/* Danger — red outline, used for Unpublish */
+.btn-danger {
+  background: transparent;
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #fff5f5;
+}
+
+/* Success — green outline, used for Publish toggle */
+.btn-success {
+  background: transparent;
+  color: var(--color-green);
+  border-color: var(--color-green);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #e8f5e9;
+}
+
+/* Small action buttons in lists (Edit, Preview, Delete) */
+.btn-sm {
+  padding: 0.4rem 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-height: 36px;
+  border-radius: 6px;
+  border-width: 0;
+}
+
+.btn-sm-edit  { background: #ebf8ff; color: #2b6cb0; }
+.btn-sm-edit:hover  { background: #bee3f8; }
+.btn-sm-delete  { background: #fff5f5; color: var(--color-red); }
+.btn-sm-delete:hover { background: #fed7d7; }
+.btn-sm-preview { background: #faf5eb; color: var(--color-copper); }
+.btn-sm-preview:hover { background: #f5e6d0; }
