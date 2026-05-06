@@ -4,7 +4,7 @@
       <div class="footer-links">
         <router-link to="/about">About</router-link>
         <router-link to="/contact">Contact</router-link>
-        <router-link to="/privacypolicy">Privacy Policy</router-link>
+        <router-link to="/privacy-policy">Privacy Policy</router-link>
       </div>
 
       <div class="footer-socials">

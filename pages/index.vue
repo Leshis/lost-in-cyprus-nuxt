@@ -1,145 +1,432 @@
 <template>
-  <div class="contact-page">
-    <div class="contact-card">
-      <h1>Get in Touch</h1>
-      <p class="subtitle">Have a secret spot to share? Or just want to say hello?</p>
+  <div class="page">
 
-      <form class="contact-form" @submit.prevent="handleSubmit">
-        <div class="field">
-          <label>Name</label>
-          <input v-model="form.name" type="text" placeholder="Your name" required />
+    <!-- ─── Hero Video Section ──────────────────────────────────────────── -->
+    <section class="hero">
+      <!-- Poster/fallback: swap src for your real image when ready -->
+      <div class="hero-fallback" />
+
+      <video
+        ref="videoEl"
+        class="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="none"
+        poster=""
+      >
+        <!-- Swap this src for your Supabase bucket URL when ready -->
+        <!-- <source src="https://YOUR_PROJECT.supabase.co/storage/v1/object/public/videos/hero.mp4" type="video/mp4" /> -->
+      </video>
+
+      <div class="hero-overlay">
+        <h1 class="hero-title">Discover Cyprus</h1>
+        <p class="hero-subtitle">Hidden secrets, untold stories</p>
+      </div>
+    </section>
+
+    <!-- ─── Map + Content ────────────────────────────────────────────────── -->
+    <div class="app-container">
+      <aside class="map-section">
+        <CyprusMap />
+      </aside>
+
+      <main class="content-section">
+        <div class="filter-row">
+          <button
+            v-for="cat in dynamicCategories"
+            :key="cat.id"
+            class="filter-pill"
+            :class="{ active: activeFilter === cat.id }"
+            @click="activeFilter = cat.id"
+          >
+            {{ cat.label }}
+          </button>
         </div>
-        <div class="field">
-          <label>Email</label>
-          <input v-model="form.email" type="email" placeholder="your@email.com" required />
+
+        <h3 class="results-header">
+          {{ filteredLocations.length }} Secrets in {{ activeDistrictName }}
+        </h3>
+
+        <div v-if="articleStore.loading" class="loading-state">
+          <p>Loading Cyprus secrets…</p>
         </div>
-        <div class="field">
-          <label>Message</label>
-          <textarea v-model="form.message" placeholder="Tell me something..." rows="5" required />
+
+        <div v-else-if="filteredLocations.length === 0" class="empty-state">
+          <p>No secrets found here yet. Try a different category!</p>
+          <button @click="resetFilters">Reset filters</button>
         </div>
 
-        <!-- Cloudflare Turnstile widget -->
-        <div ref="turnstileEl" class="turnstile-wrapper"></div>
+        <div v-else class="card-grid">
+          <div
+            v-for="(loc, index) in filteredLocations"
+            :key="loc.id"
+            class="location-card"
+          >
+            <img
+              :src="getImageUrl(loc.image_url ?? '')"
+              :srcset="getImageSrcset(loc.image_url ?? '')"
+              :loading="index === 0 ? 'eager' : 'lazy'"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              :alt="loc.title"
+              class="card-img"
+            />
 
-        <button type="submit" :disabled="loading || !turnstileToken" class="btn-primary">
-          {{ loading ? 'Sending...' : 'Send Message' }}
-        </button>
+            <div class="card-content">
+              <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
+              <h4>{{ loc.title }}</h4>
+              <p>Discover this hidden Cyprus secret.</p>
 
-        <p v-if="success" class="feedback success">Message sent! I'll get back to you soon. 🌿</p>
-        <p v-if="error" class="feedback error">Something went wrong. Please try again.</p>
-      </form>
+              <div class="card-footer">
+                <small>{{ loc.district }}</small>
+                <button class="action-btn" @click="handleAction(loc)">
+                  {{ loc.affiliate_url ? 'Book Now' : 'Read More' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import emailjs from '@emailjs/browser';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
+import { useRouter } from 'vue-router'
+import { useMapStore } from '@/stores/mapStore'
+import { useArticleStore } from '@/stores/articleStore'
+import { getImageUrl, getImageSrcset } from '@/utils/supabaseHelpers'
+import type { Article } from '@/types/article'
 
-const form = ref({ name: '', email: '', message: '' });
-const loading = ref(false);
-const success = ref(false);
-const error = ref(false);
+interface Category {
+  id: string
+  label: string
+}
 
-// Turnstile
-const turnstileEl = ref<HTMLElement | null>(null);
-const turnstileToken = ref<string | null>(null);
-let widgetId: string | null = null;
-// NOTE: Token verification is currently client-side only.
-// This must be moved to a server endpoint (Nuxt server route) to prevent bypass.
+const CyprusMap = defineAsyncComponent(() => import('@/components/CyprusMap.vue'))
+
+const CATEGORY_EMOJIS: Record<string, string> = {
+  beaches: '🏖️',
+  hiking: '🥾',
+  wine: '🍷',
+  culture: '🏛️',
+  archaeology: '🏺',
+  gastronomy: '🍲',
+  religious: '⛪',
+  rural: '🏡',
+  diving: '🤿',
+  nightlife: '🪩',
+  nature: '🌿',
+  family: '🎡',
+  wellness: '🧘‍♀️',
+  hidden_gems: '💎',
+}
+
+const mapStore = useMapStore()
+const articleStore = useArticleStore()
+const router = useRouter()
+const activeFilter = ref<string>('all')
+const videoEl = ref<HTMLVideoElement | null>(null)
 
 onMounted(() => {
-  // Load Turnstile script
-  const script = document.createElement('script');
-  script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-  script.async = true;
-  script.defer = true;
-  script.onload = () => {
-    widgetId = (window as any).turnstile.render(turnstileEl.value, {
-      sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
-      callback: (token: string) => { turnstileToken.value = token; },
-      'expired-callback': () => { turnstileToken.value = null; },
-      'error-callback': () => { turnstileToken.value = null; },
-    });
-  };
-  document.head.appendChild(script);
-});
+  articleStore.fetchArticles()
 
-onUnmounted(() => {
-  if (widgetId) (window as any).turnstile?.remove(widgetId);
-});
+  // Only load video on fast connections
+  const connection = (navigator as any).connection
+  const savingData = connection?.saveData || connection?.effectiveType === '2g'
 
-const handleSubmit = async () => {
-  if (!turnstileToken.value) return;
-
-  loading.value = true;
-  success.value = false;
-  error.value = false;
-
-  try {
-    await emailjs.send(
-      import.meta.env.VITE_EMAILJS_SERVICE_ID,
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-      {
-        from_name: form.value.name,
-        from_email: form.value.email,
-        message: form.value.message,
-      },
-      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-    );
-
-    success.value = true;
-    form.value = { name: '', email: '', message: '' };
-    // Reset turnstile for next submission
-    (window as any).turnstile?.reset(widgetId);
-    turnstileToken.value = null;
-  } catch (e) {
-    console.error('EmailJS error:', e);
-    error.value = true;
-  } finally {
-    loading.value = false;
+  if (!savingData && videoEl.value) {
+    // Uncomment when your Supabase URL is ready:
+    // videoEl.value.src = 'https://YOUR_PROJECT.supabase.co/storage/v1/object/public/videos/hero.mp4'
+    // videoEl.value.load()
   }
-};
+})
+
+const formatCategoryLabel = (cat: string): string => {
+  const emoji = CATEGORY_EMOJIS[cat.toLowerCase()] ?? '📍'
+  const formattedText = cat
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+  return `${emoji} ${formattedText}`
+}
+
+const dynamicCategories = computed<Category[]>(() => {
+  const unique = [...new Set(
+    articleStore.publishedArticles.map(i => i.category).filter(Boolean)
+  )]
+  return [
+    { id: 'all', label: 'All' },
+    ...unique.map(cat => ({ id: cat, label: formatCategoryLabel(cat) })),
+  ]
+})
+
+const activeDistrictName = computed<string>(() =>
+  mapStore.selectedDistrict
+    ? mapStore.selectedDistrict.charAt(0).toUpperCase() + mapStore.selectedDistrict.slice(1)
+    : 'Cyprus'
+)
+
+const filteredLocations = computed<Article[]>(() =>
+  articleStore.publishedArticles.filter(loc => {
+    const matchDistrict = !mapStore.selectedDistrict || loc.district === mapStore.selectedDistrict
+    const matchCategory = activeFilter.value === 'all' || loc.category === activeFilter.value
+    return matchDistrict && matchCategory
+  })
+)
+
+const resetFilters = (): void => {
+  activeFilter.value = 'all'
+  mapStore.setSelectedDistrict(null)
+}
+
+const handleAction = (loc: Article): void => {
+  loc.affiliate_url
+    ? window.open(loc.affiliate_url, '_blank', 'noopener,noreferrer')
+    : router.push(`/article/${loc.slug}`)
+}
 </script>
 
 <style scoped>
-.contact-page {
-  min-height: 100svh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 6rem 1.5rem 4rem;
+/* ─── Hero ──────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 45svh;
+  min-height: 260px;
+  overflow: hidden;
+  background-color: #1c2a32;
 }
 
-.contact-card {
+.hero-fallback {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1c2a32 0%, #2d4a3e 50%, #c69f4b22 100%);
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  max-width: 520px;
+  height: 100%;
+  object-fit: cover;
 }
 
-h1 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #1c2a32;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: #6b7280;
-  margin-bottom: 2rem;
-}
-
-.contact-form {
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 100%);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
 }
 
-.turnstile-wrapper {
+.hero-title {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+.hero-subtitle {
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* ─── App container ─────────────────────────────────────────────────────── */
+.app-container {
   display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #f8f6f0;
+}
+
+.map-section {
+  height: 45svh;
+  min-height: 280px;
+  background-color: #fdfcf8;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.feedback { text-align: center; font-size: 0.9rem; }
-.success { color: #16a34a; }
-.error { color: #dc2626; }
+.content-section {
+  flex: 1;
+  background-color: #f8f6f0;
+  overflow-y: auto;
+  padding: 20px 16px;
+  border-radius: 20px 20px 0 0;
+  margin-top: -20px;
+  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Filter pills ──────────────────────────────────────────────────────── */
+.filter-row {
+  display: flex;
+  gap: 8px;
+  margin: 0 -16px 16px;
+  padding: 0 16px 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filter-row::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.filter-pill.active {
+  background: #c69f4b;
+  color: white;
+  border-color: #c69f4b;
+}
+
+/* ─── Results header ────────────────────────────────────────────────────── */
+.results-header {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  color: #1a1a1a;
+}
+
+/* ─── States ────────────────────────────────────────────────────────────── */
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.empty-state button {
+  margin-top: 12px;
+  background: #1c2a32;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ─── Cards ─────────────────────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding-bottom: 40px;
+}
+
+.location-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background-color: #eee;
+  transition: transform 0.4s ease;
+}
+
+.location-card:hover .card-img { transform: scale(1.05); }
+
+.card-content { padding: 16px; }
+
+.category-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #c69f4b;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.card-content h4 { margin: 4px 0; color: #1a1a1a; }
+
+.card-content p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+
+.card-footer small { text-transform: capitalize; color: #999; }
+
+.action-btn {
+  background: #1c2a32;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* ─── Desktop ───────────────────────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .hero {
+    height: 50svh;
+  }
+
+  .app-container {
+    flex-direction: row;
+    height: 50dvh;
+    overflow: hidden;
+  }
+
+  .map-section {
+    flex: 0 0 50%;
+    height: 100%;
+    min-height: unset;
+  }
+
+  .content-section {
+    flex: 0 0 50%;
+    height: 100%;
+    border-radius: 0;
+    margin-top: 0;
+    padding: 30px;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+  }
+
+  .filter-row {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
 </style>

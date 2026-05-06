@@ -12,7 +12,7 @@
 
         <router-link to="/about" class="nav-link">About</router-link>
         <router-link to="/contact" class="nav-link">Contact</router-link>
-        <router-link to="/privacypolicy" class="nav-link">Privacy Policy</router-link>
+        <router-link to="/privacy-policy" class="nav-link">Privacy Policy</router-link>
       </div>
 
       <button type="button" class="hamburger-trigger" aria-label="Open menu" @click="emit('openMenu')">

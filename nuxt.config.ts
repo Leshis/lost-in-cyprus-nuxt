@@ -24,10 +24,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      emailjsServiceId: '',
-      emailjsTemplateId: '',
-      emailjsPublicKey: '',
-      turnstileSiteKey: '',
+      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID,
+      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY,
+      // If using the official Nuxt Turnstile module, it usually expects this structure:
+      turnstile: {
+        siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
+      },
     },
   },
 
@@ -47,6 +50,6 @@ export default defineNuxtConfig({
     },
   },
   experimental: {
-    externalVue: false,
+    viteEnvironmentApi: true
   }
 })

@@ -36,6 +36,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import emailjs from '@emailjs/browser';
 
+const config = useRuntimeConfig();
 const form = ref({ name: '', email: '', message: '' });
 const loading = ref(false);
 const success = ref(false);
@@ -49,19 +50,29 @@ let widgetId: string | null = null;
 // This must be moved to a server endpoint (Nuxt server route) to prevent bypass.
 
 onMounted(() => {
-  // Load Turnstile script
+  // 1. Check if the key exists before doing ANYTHING
+  const siteKey = config.public.turnstileSiteKey || config.public.turnstile?.siteKey;
+
+  if (!siteKey) {
+    console.error("🚫 Turnstile SiteKey is missing from config!");
+    return; // Stop here so we don't trigger the global crash
+  }
+
   const script = document.createElement('script');
-  script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+  // Use explicit render to prevent the script from "hunting" for divs automatically
+  script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
   script.async = true;
   script.defer = true;
+  
   script.onload = () => {
-    widgetId = (window as any).turnstile.render(turnstileEl.value, {
-      sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
-      callback: (token: string) => { turnstileToken.value = token; },
-      'expired-callback': () => { turnstileToken.value = null; },
-      'error-callback': () => { turnstileToken.value = null; },
-    });
+    if ((window as any).turnstile) {
+      widgetId = (window as any).turnstile.render(turnstileEl.value, {
+        sitekey: siteKey, // Use the variable we verified above
+        callback: (token: string) => { turnstileToken.value = token; },
+      });
+    }
   };
+  
   document.head.appendChild(script);
 });
 
@@ -78,14 +89,14 @@ const handleSubmit = async () => {
 
   try {
     await emailjs.send(
-      import.meta.env.VITE_EMAILJS_SERVICE_ID,
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      config.public.emailjsServiceId,
+      config.public.emailjsTemplateId,
       {
         from_name: form.value.name,
         from_email: form.value.email,
         message: form.value.message,
       },
-      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      config.public.emailjsPublicKey
     );
 
     success.value = true;

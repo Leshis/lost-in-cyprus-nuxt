@@ -27,8 +27,20 @@ const shouldHideNav = computed(() =>
 
 watch(() => route.fullPath, () => { isMenuOpen.value = false; });
 
-const markErrored = () => {
-  hasGlobalError.value = true
+const markErrored = (event: any) => {
+  hasGlobalError.value = true;
+
+  // Log the specific details to the console
+  console.error("🔥 Global Error Caught!");
+  console.log("Type:", event.type); // 'error', 'unhandledrejection', or 'app-global-error'
+  
+  if (event.type === 'unhandledrejection') {
+    console.log("Reason:", event.reason); // Detailed promise rejection info
+  } else if (event.error) {
+    console.log("Error Object:", event.error); // The actual JS error stack
+  } else {
+    console.log("Event Data:", event);
+  }
 }
 
 onMounted(() => {
