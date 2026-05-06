@@ -1,11 +1,11 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
-  compatibilityDate: '2026-05-06',
+  //compatibilityDate: '2026-05-06',
   devtools: { enabled: true },
   ssr: false,
 
   nitro: {
-    preset: 'github-pages',
+    preset: process.env.NODE_ENV === 'production' ? 'github-pages' : undefined,
   },
 
   modules: [
@@ -32,7 +32,7 @@ export default defineNuxtConfig({
   },
 
   app: {
-    //baseURL: process.env.NODE_ENV === 'production' ? '/lost-in-cyprus-nuxt/' : '/',
+    baseURL: process.env.NODE_ENV === 'production' ? '/lost-in-cyprus-nuxt/' : '/',
     head: {
       htmlAttrs: { lang: 'en' },
       link: [
@@ -46,4 +46,7 @@ export default defineNuxtConfig({
       ],
     },
   },
+  experimental: {
+    externalVue: false,
+  }
 })
