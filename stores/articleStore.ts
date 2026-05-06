@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
-const supabase = useSupabaseClient()
-const user = useSupabaseUser()
 import type { Article } from '@/types/article'
 
 interface ArticleState {
   items: Article[]
   loading: boolean
-  error: string | null       // surface errors instead of only console.error
+  error: string | null
   lastFetched: number | null
 }
 
@@ -43,6 +41,7 @@ export const useArticleStore = defineStore('articles', {
 
   actions: {
     async fetchArticles(force = false): Promise<void> {
+      const supabase = useSupabaseClient()
       if (!force && this.lastFetched && Date.now() - this.lastFetched < 5 * 60 * 1000) return
 
       this.loading = true
@@ -66,6 +65,7 @@ export const useArticleStore = defineStore('articles', {
     },
 
     async fetchArticleBySlug(slug: string): Promise<void> {
+      const supabase = useSupabaseClient()
       this.loading = true
       this.error = null
       try {
@@ -96,10 +96,11 @@ export const useArticleStore = defineStore('articles', {
     },
 
     async fetchArticleBySlugAdmin(slug: string): Promise<void> {
+      const supabase = useSupabaseClient()
       this.loading = true
       this.error = null
       try {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await supabase
           .from('articles')
           .select('*')
           .eq('slug', slug)
@@ -123,6 +124,7 @@ export const useArticleStore = defineStore('articles', {
         this.loading = false
       }
     },
+
     async forceRefresh(): Promise<void> {
       this.lastFetched = null
       await this.fetchArticles(true)

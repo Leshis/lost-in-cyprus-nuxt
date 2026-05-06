@@ -1,44 +1,38 @@
-
-
 // nuxt.config.ts
 export default defineNuxtConfig({
+  compatibilityDate: '2026-05-06',
   devtools: { enabled: true },
+  ssr: false,
+
+  nitro: {
+    preset: 'github-pages',
+  },
 
   modules: [
-    '@nuxtjs/supabase',
+    ['@nuxtjs/supabase', {
+      types: null,
+      redirectOptions: {
+        login: '/login',
+        callback: '/confirm',
+        include: ['/gate', '/gate/*'],
+      },
+    }],
     '@pinia/nuxt',
-    '@nuxtjs/sitemap',
   ],
 
   css: ['~/assets/main.css'],
 
-  supabase: {
-    // Redirect unauthenticated users away from /gate
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
-      include: ['/gate', '/gate/*'],
+  runtimeConfig: {
+    public: {
+      emailjsServiceId: '',
+      emailjsTemplateId: '',
+      emailjsPublicKey: '',
+      turnstileSiteKey: '',
     },
   },
 
-  sitemap: {
-    hostname: 'https://yourdomain.netlify.app', // update when live
-    // Dynamic article routes are added automatically via Nuxt's route discovery
-    // You'll add a custom source for Supabase slugs in Phase 7
-    sources: ['/api/__sitemap__/urls'],
-  },
-
-  runtimeConfig: {
-  turnstileSecretKey: '', // server-only, set in Netlify
-  public: {
-    emailjsServiceId: '',
-    emailjsTemplateId: '',
-    emailjsPublicKey: '',
-    turnstileSiteKey: '',
-  },
-},
-
   app: {
+    //baseURL: process.env.NODE_ENV === 'production' ? '/lost-in-cyprus-nuxt/' : '/',
     head: {
       htmlAttrs: { lang: 'en' },
       link: [
@@ -50,34 +44,6 @@ export default defineNuxtConfig({
         },
         { rel: 'icon', href: '/lost-in-cyprus.png' },
       ],
-      meta: [
-        { name: 'referrer', content: 'no-referrer' },
-      ],
     },
   },
-
-  // Vite config passthrough
-  vite: {
-    plugins: [],
-  },
-  hooks: {
-    async 'nitro:config'(nitroConfig) {
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(
-        process.env.NUXT_PUBLIC_SUPABASE_URL!,
-        process.env.NUXT_PUBLIC_SUPABASE_KEY!
-      )
-      const { data } = await supabase
-        .from('articles')
-        .select('slug')
-        .eq('is_published', true)
-
-      const slugRoutes = (data ?? []).map(({ slug }) => `/articles/${slug}`)
-      nitroConfig.prerender = nitroConfig.prerender || {}
-      nitroConfig.prerender.routes = [
-        ...(nitroConfig.prerender.routes || []),
-        ...slugRoutes,
-      ]
-    },
-  }
 })

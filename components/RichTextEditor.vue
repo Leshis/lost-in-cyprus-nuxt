@@ -9,9 +9,9 @@
           v-else
           type="button"
           :title="btn.title"
-          :class="['rte-btn', { active: activeStates[btn.cmd] }]"
+          :class="['rte-btn', { active: btn.cmd ? activeStates[btn.cmd] : false }]"
           :style="btn.style"
-          @mousedown.prevent="execCmd(btn.cmd, btn.value)"
+          @mousedown.prevent="btn.cmd ? execCmd(btn.cmd, btn.value) : null"
         >
           {{ btn.label }}
         </button>
@@ -78,7 +78,7 @@
           <label class="rte-modal-label">Alignment</label>
           <div class="rte-align-btns">
             <button
-              v-for="a in ['left', 'center', 'right']"
+              v-for="a in (['left', 'center', 'right'] as const)"
               :key="a"
               type="button"
               :class="['rte-align-btn', { active: imageForm.align === a }]"
@@ -171,9 +171,8 @@ function updateStates() {
 
 function execCmd(cmd: string, value?: string) {
   editorEl.value?.focus()
-  document.execCommand(cmd, false, value ?? null)
-  updateStates()
   emit('update:modelValue', sanitize(editorEl.value?.innerHTML ?? ''))
+  updateStates()
 }
 
 function onInput() {

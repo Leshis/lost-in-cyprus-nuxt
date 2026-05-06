@@ -2,7 +2,7 @@
 export const getImageUrl = (path: string) => {
   if (!path) return 'https://placehold.jp/24/1c2a32/ffffff/150x150.png?text=LostInCyprus';
 
-  const projectID = import.meta.env.VITE_SUPABASE_URL
+  const projectID = (import.meta.env.NUXT_PUBLIC_SUPABASE_URL as string)
     ?.match(/https:\/\/(.+)\.supabase\.co/)?.[1]
   const bucketName = 'articles'; 
 

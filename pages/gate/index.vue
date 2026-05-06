@@ -74,7 +74,6 @@ definePageMeta({
 })
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-const user = useSupabaseUser()
 import { useAdminArticles } from '@/composables/useAdminArticles'
 import { useArticleForm } from '@/composables/useArticleForm'
 import { useDeleteModal } from '@/composables/useDeleteModal'
@@ -89,6 +88,7 @@ useHead({
   meta: [{ name: 'robots', content: 'noindex, nofollow' }]
 })
 
+const supabase = useSupabaseClient()
 const router = useRouter()
 const activeTab = ref<'list' | 'create'>('list')
 
@@ -126,7 +126,7 @@ const handleEditAndSwitch = (article: Article) => {
 }
 
 const handleLogout = async () => {
-  await supabaseAdmin.auth.signOut()
+  await supabase.auth.signOut()
   router.push('/login')
 }
 </script>

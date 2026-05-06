@@ -41,10 +41,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-const user = useSupabaseUser()
 import { useRouter } from 'vue-router'
 import type { AuthError } from '@supabase/supabase-js'
 
+const supabase = useSupabaseClient()
 const router = useRouter()
 const email = ref<string>('')
 const password = ref<string>('')
@@ -53,10 +53,10 @@ const errorMsg = ref<string>('')
 
 const handleLogin = async (): Promise<void> => {
   try {
-    loading.value = true  // ← was loading.ref = true (bug)
+    loading.value = true
     errorMsg.value = ''
 
-    const { error } = await supabaseAdmin.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: email.value,
       password: password.value,
     })
@@ -73,7 +73,6 @@ const handleLogin = async (): Promise<void> => {
 </script>
 
 <style scoped>
-/* ── Mobile first ─────────────────────── */
 .login-container {
   display: flex;
   justify-content: center;
@@ -90,50 +89,51 @@ const handleLogin = async (): Promise<void> => {
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(28, 42, 50, 0.05);
   width: 100%;
+  max-width: 400px;
   text-align: center;
   border: 1px solid #eee;
 }
 
 .brand-title {
-  color: #b57b52;
-  font-family: Georgia, serif;
   font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: #1c2a32;
+  margin-bottom: 0.25rem;
 }
 
 .subtitle {
-  color: #1c2a32;
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin-bottom: 2rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 1.5rem;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   text-align: left;
 }
 
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
 .input-group label {
-  display: block;
-  font-size: 0.85rem;
-  color: #1c2a32;
-  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
   font-weight: 600;
+  color: #2c3e50;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .input-group input {
-  width: 100%;
-  padding: 0.85rem;
-  border: 1px solid #ddd;
+  padding: 0.75rem;
+  border: 2px solid #edf2f7;
   border-radius: 8px;
-  background-color: #fafafa;
-  font-size: 1rem; /* prevents iOS zoom on focus */
+  font-size: 1rem;
   transition: border-color 0.2s;
-  box-sizing: border-box;
 }
 
 .input-group input:focus {
@@ -142,44 +142,30 @@ const handleLogin = async (): Promise<void> => {
 }
 
 .login-btn {
-  background-color: #1c2a32;
+  margin-top: 0.5rem;
+  padding: 0.875rem;
+  background: #b57b52;
   color: white;
-  padding: 1rem;
   border: none;
   border-radius: 8px;
+  font-weight: 700;
   font-size: 1rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  width: 100%;
-  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s;
 }
 
-.login-btn:hover {
-  background-color: #b57b52;
+.login-btn:hover:not(:disabled) {
+  background: #a06a45;
 }
 
 .login-btn:disabled {
-  opacity: 0.5;
+  background: #cbd5e0;
   cursor: not-allowed;
 }
 
 .error-text {
-  color: #d9534f;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+  color: #c62828;
   text-align: center;
-  margin: 0;
-}
-
-/* ── Desktop ───────────────────────────── */
-@media (min-width: 480px) {
-  .login-card {
-    padding: 2.5rem;
-    max-width: 420px;
-  }
-
-  .brand-title {
-    font-size: 1.75rem;
-  }
 }
 </style>

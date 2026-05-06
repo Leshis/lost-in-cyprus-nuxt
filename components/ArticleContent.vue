@@ -49,8 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import DOMPurify from 'dompurify'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { getImageUrl } from '@/utils/supabaseHelpers'
 import { getImageSrcset } from '@/utils/supabaseHelpers'
 import type { Article } from '@/types/article';
