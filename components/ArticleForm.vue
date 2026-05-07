@@ -136,11 +136,25 @@ const localForm = computed({
 
 <style scoped>
 .article-form {
+  display: flex; /* Ensure form fields also stack correctly */
+  flex-direction: column;
   gap: 1.5rem;
 }
 
 .actions {
   display: flex;
   gap: 1rem;
+}
+
+/* Mobile View (typically under 600px or 768px) */
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column; /* Stacks the buttons vertically */
+  }
+
+  .actions button {
+    width: 100%; /* Makes buttons equal width to the form container */
+    margin-right: 0;
+  }
 }
 </style>
