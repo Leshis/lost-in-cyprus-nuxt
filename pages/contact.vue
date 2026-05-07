@@ -52,7 +52,7 @@ let widgetId: string | null = null;
 onMounted(() => {
   console.log('🔍 Nuxt Public Config:', useRuntimeConfig().public);
   // 1. Check if the key exists before doing ANYTHING
-  const siteKey = config.public.turnstileSiteKey || config.public.turnstile?.siteKey;
+  const siteKey = config.public.turnstile?.siteKey;
 
   if (!siteKey) {
     console.error("🚫 Turnstile SiteKey is missing from config!");
