@@ -86,16 +86,15 @@ const selectDistrictGuarded = (id: string): void => {
 }
 
 .district-default {
-  fill: #cbd5e1;
-  stroke: #94a3b8;
+  fill: var(--district);
+  stroke: var(--district-stroke);
   stroke-width: 1;
   opacity: 1;
 }
 
 .district-active {
-  fill: #b57b52;
-  stroke: #8d5d3a;
-  stroke-width: 2.5;
+  fill: var(--color-copper);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
   opacity: 1;
 }
 

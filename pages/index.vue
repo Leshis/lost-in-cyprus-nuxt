@@ -21,7 +21,7 @@
       </video>
 
       <div class="hero-overlay">
-        <h1 class="hero-title">Discover Cyprus</h1>
+        <h1 class="hero-title">Lost In Cyprus</h1>
         <p class="hero-subtitle">Hidden secrets, untold stories</p>
       </div>
     </section>
@@ -191,8 +191,10 @@ const handleAction = (loc: Article): void => {
 </script>
 
 <style scoped>
-.page {
-  padding-top: var(--navbar-height);
+@media (min-width: 770px) {
+  .page {
+    padding-top: var(--navbar-height);
+  }
 }
 
 /* ─── Hero ──────────────────────────────────────────────────────────────── */
@@ -299,6 +301,10 @@ const handleAction = (loc: Article): void => {
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
+.filter-pill:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
 .filter-pill.active {
   background: #c69f4b;
   color: white;
@@ -392,6 +398,11 @@ const handleAction = (loc: Article): void => {
   border-radius: 6px;
   font-size: 0.8rem;
   cursor: pointer;
+  transition: background 0.2s color 0.2s;
+}
+
+.action-btn:hover {
+  background: rgba(0, 0, 0, 0.56);
 }
 
 /* ─── Desktop ───────────────────────────────────────────────────────────── */
