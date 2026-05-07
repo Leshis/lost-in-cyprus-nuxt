@@ -191,6 +191,10 @@ const handleAction = (loc: Article): void => {
 </script>
 
 <style scoped>
+.page {
+  padding-top: var(--navbar-height);
+}
+
 /* ─── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;

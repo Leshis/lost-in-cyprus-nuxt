@@ -119,7 +119,7 @@ const handleSubmit = async () => {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 6rem 1.5rem 4rem;
+  padding: var(--navbar-height) 1.5rem 4rem;
 }
 
 .contact-card {

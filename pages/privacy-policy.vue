@@ -97,6 +97,7 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
   background-color: #f8f6f0;
   color: #1c2a32;
   min-height: 100svh;
+  padding-top: var(--navbar-height);
 }
 
 .privacy-header {

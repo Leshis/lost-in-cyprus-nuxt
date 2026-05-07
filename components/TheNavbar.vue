@@ -44,7 +44,7 @@ const showBack = computed(() => route.name === 'articles-slug');
   top: 0; left: 0; right: 0;
   z-index: 50;
   padding: 0 40px;
-  height: 68px;
+  height: var(--navbar-height);
   display: flex;
   align-items: center;
   background: rgba(248, 246, 240, 0.85);

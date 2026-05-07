@@ -8,6 +8,7 @@
 <style scoped>
 .about-page {
   padding: 20px;
+  padding-top: var(--navbar-height);
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
