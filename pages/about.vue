@@ -7,10 +7,9 @@
 
 <style scoped>
 .about-page {
-  padding: 20px;
   padding-top: var(--navbar-height);
   text-align: center;
-  max-width: 800px;
+  max-width: var(--container-narrow);
   margin: 0 auto;
 }
 </style>

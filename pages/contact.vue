@@ -67,7 +67,9 @@ onMounted(() => {
   script.onload = () => {
     if ((window as any).turnstile) {
       widgetId = (window as any).turnstile.render(turnstileEl.value, {
-        sitekey: siteKey, // Use the variable we verified above
+        sitekey: siteKey, 
+        size: 'flexible',
+        theme: 'light',
         callback: (token: string) => { turnstileToken.value = token; },
       });
     }
@@ -119,7 +121,7 @@ const handleSubmit = async () => {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--navbar-height) 1.5rem 4rem;
+  padding: var(--navbar-height) 10px 4rem;
 }
 
 .contact-card {
@@ -153,4 +155,11 @@ h1 {
 .feedback { text-align: center; font-size: 0.9rem; }
 .success { color: #16a34a; }
 .error { color: #dc2626; }
+
+@media (min-width: 400px) { 
+  .contact-page {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
 </style>
