@@ -90,19 +90,22 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
-
 .privacy-page {
-  font-family: 'DM Sans', sans-serif;
-  background-color: #f8f6f0;
-  color: #1c2a32;
+  background-color: var(--bg-warm);
+  color: var(--color-navy);
   min-height: 100svh;
-  padding-top: var(--navbar-height);
+  padding-top: 0; /* Reset for mobile */
+}
+
+@media (min-width: 768px) {
+  .privacy-page {
+    padding-top: var(--navbar-height);
+  }
 }
 
 .privacy-header {
-  background-color: #1c2a32;
-  padding: 64px 24px 56px;
+  background-color: var(--color-navy);
+  padding: var(--space-5) var(--space-4) 56px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -115,7 +118,7 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 80% 50%, rgba(198, 159, 75, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, var(--color-gold-muted) 0%, transparent 60%),
     radial-gradient(ellipse at 20% 80%, rgba(198, 159, 75, 0.06) 0%, transparent 50%);
 }
 
@@ -123,25 +126,24 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
 
 .header-eyebrow {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--size-xs);
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #c69f4b;
-  margin-bottom: 12px;
+  color: var(--color-gold);
+  margin-bottom: var(--space-2);
 }
 
 .header-title {
-  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 16px;
+  font-weight: var(--weight-bold);
+  color: var(--text-white);
+  margin: 0 0 var(--space-3);
   line-height: 1;
 }
 
 .header-meta {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.45);
+  font-size: var(--size-sm);
+  color: rgba(255, 255, 255, 0.45);
   margin: 0;
 }
 
@@ -155,60 +157,64 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
 }
 
 .privacy-body {
-  max-width: 800px; /* Narrower layout now that TOC is gone */
+  max-width: var(--container-narrow);
   margin: 0 auto;
-  padding: 48px 24px 80px;
+  padding: var(--space-5) var(--space-4) 80px;
 }
 
 .privacy-content {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: var(--space-5);
 }
 
 .intro-block {
-  background: #1c2a32;
-  color: rgba(255,255,255,0.85);
-  border-radius: 12px;
+  background: var(--color-navy);
+  color: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius);
   padding: 28px 32px;
-  font-size: 1rem;
+  font-size: var(--size-base);
   line-height: 1.7;
 }
 
 .policy-section {
-  padding-bottom: 32px;
+  padding-bottom: var(--space-5);
 }
 
 .policy-section h2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #1c2a32;
-  margin: 0 0 16px;
+  font-size: var(--size-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-navy);
+  margin: 0 0 var(--space-3);
 }
 
 .policy-section p {
-  font-size: 0.95rem;
+  font-size: var(--size-base);
   line-height: 1.8;
-  color: #3d4f58;
+  color: var(--color-text-mid);
 }
 
 .service-list {
   list-style: none;
   padding: 0;
-  margin: 16px 0 0;
+  margin: var(--space-3) 0 0;
 }
 
 .service-list li {
-  font-size: 0.9rem;
-  color: #3d4f58;
-  padding: 8px 0;
-  border-bottom: 1px solid #e4dfd5;
+  font-size: var(--size-sm);
+  color: var(--color-text-mid);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-mid);
 }
 
-.service-list li:last-child { border-bottom: none; }
+.service-list li:last-child { 
+  border-bottom: none; 
+}
 
-.service-list strong { color: #1c2a32; font-weight: 500; }
+.service-list strong { 
+  color: var(--color-navy); 
+  font-weight: var(--weight-bold); 
+}
 
 @media (min-width: 900px) {
   .privacy-header { padding: 80px 60px 64px; }
