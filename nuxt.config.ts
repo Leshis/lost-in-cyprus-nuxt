@@ -1,6 +1,6 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
-  //compatibilityDate: '2026-05-06',
+  compatibilityDate: '2026-05-06',
   devtools: { enabled: true },
   ssr: false,
   modules: [
@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     },
   },
   app: {
+    baseURL: '/',
     head: {
       htmlAttrs: { lang: 'en' },
       link: [
