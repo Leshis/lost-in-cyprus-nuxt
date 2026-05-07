@@ -34,7 +34,7 @@ const emit = defineEmits<{ openMenu: [] }>();
 const router = useRouter();
 const route = useRoute();
 
-const showBack = computed(() => route.name === 'Article');
+const showBack = computed(() => route.name === 'articles-slug');
 </script>
 
 <style scoped>

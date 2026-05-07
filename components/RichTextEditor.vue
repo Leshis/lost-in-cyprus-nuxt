@@ -111,6 +111,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import DOMPurify from 'dompurify';
 
 const props = defineProps<{
   modelValue: string
@@ -152,10 +153,7 @@ const wordCount = computed(() => {
 })
 
 function sanitize(html: string) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/on\w+="[^"]*"/gi, '')
-    .replace(/javascript:/gi, '')
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
 }
 
 function updateStates() {
@@ -171,6 +169,7 @@ function updateStates() {
 
 function execCmd(cmd: string, value?: string) {
   editorEl.value?.focus()
+  document.execCommand(cmd, false, value)
   emit('update:modelValue', sanitize(editorEl.value?.innerHTML ?? ''))
   updateStates()
 }

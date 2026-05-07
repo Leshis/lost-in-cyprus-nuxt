@@ -3,11 +3,6 @@ export default defineNuxtConfig({
   //compatibilityDate: '2026-05-06',
   devtools: { enabled: true },
   ssr: false,
-
-  nitro: {
-    preset: process.env.NODE_ENV === 'production' ? 'github-pages' : undefined,
-  },
-
   modules: [
     ['@nuxtjs/supabase', {
       types: null,
@@ -20,9 +15,7 @@ export default defineNuxtConfig({
     }],
     '@pinia/nuxt',
   ],
-
   css: ['~/assets/main.css'],
-
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
@@ -35,9 +28,7 @@ export default defineNuxtConfig({
       },
     },
   },
-
   app: {
-    baseURL: process.env.NODE_ENV === 'production' ? '/lost-in-cyprus-nuxt/' : '/',
     head: {
       htmlAttrs: { lang: 'en' },
       link: [
