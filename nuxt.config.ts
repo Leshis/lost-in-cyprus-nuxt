@@ -48,7 +48,7 @@ export default defineNuxtConfig({
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
         },
-        { rel: 'icon', href: '/lost-in-cyprus.png' },
+        { rel: 'icon', href: '/lost-in-cyprus.webp' },
       ],
     },
   },
