@@ -10,7 +10,7 @@
     >
       <div class="menu-card">
         <div class="menu-header">
-          <img src="/lost-in-cyprus.png" class="menu-logo-small" alt="Lost in Cyprus" />
+          <img src="/lost-in-cyprus.webp" class="menu-logo-small" alt="Lost in Cyprus" />
           <button class="close-x" @click="emit('close')" aria-label="Close menu">✕</button>
         </div>
 
