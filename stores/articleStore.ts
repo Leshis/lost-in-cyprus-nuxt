@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Article } from '@/types/article'
+import type { Article } from '~/types/database.types'
 
 interface ArticleState {
   items: Article[]

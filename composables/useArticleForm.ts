@@ -1,5 +1,5 @@
 import { ref, reactive, watch } from 'vue'
-import type { Article } from '@/types/article'
+import type { Article } from '~/types/database.types'
 
 export type ArticleFormFields = Omit<Article, 'id' | 'created_at'>
 

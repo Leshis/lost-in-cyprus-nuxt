@@ -1,6 +1,6 @@
 import { ref, onMounted } from 'vue'
 import { processEnum } from '@/utils/articleHelpers'
-import type { Article } from '@/types/article'
+import type { Article } from '~/types/database.types'
 
 export function useAdminArticles() {
     const supabase = useSupabaseClient()

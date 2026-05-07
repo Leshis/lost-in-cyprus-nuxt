@@ -99,7 +99,7 @@ import { useRouter } from 'vue-router'
 import { useMapStore } from '@/stores/mapStore'
 import { useArticleStore } from '@/stores/articleStore'
 import { getImageUrl, getImageSrcset } from '@/utils/supabaseHelpers'
-import type { Article } from '@/types/article'
+import type { Article } from '~/types/database.types'
 
 interface Category {
   id: string

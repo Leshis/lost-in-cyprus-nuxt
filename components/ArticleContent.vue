@@ -52,7 +52,7 @@
 import { onMounted, ref, watchEffect } from 'vue'
 import { getImageUrl } from '@/utils/supabaseHelpers'
 import { getImageSrcset } from '@/utils/supabaseHelpers'
-import type { Article } from '@/types/article';
+import type { Article } from '~/types/database.types';
 
 type PreviewArticle = Omit<Article, 'id' | 'image_url' | 'created_at'> & {
   id?: number

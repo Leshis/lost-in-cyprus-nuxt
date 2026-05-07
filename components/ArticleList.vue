@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { Article } from '@/types/article';
+import type { Article } from '~/types/database.types';
 
 // ─── Sub-component: status badge ─────────────────────────────────────────────
 

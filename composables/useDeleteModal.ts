@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { Article } from '@/types/article'
+import type { Article } from '~/types/database.types'
 
 export function useDeleteModal(articles: import('vue').Ref<Article[]>) {
   const supabase = useSupabaseClient()

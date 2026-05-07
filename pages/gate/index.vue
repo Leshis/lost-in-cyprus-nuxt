@@ -81,7 +81,7 @@ import ArticleContent from '@/components/ArticleContent.vue'
 import ArticleList from '@/components/ArticleList.vue'
 import ArticleForm from '@/components/ArticleForm.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
-import type { Article } from '@/types/article'
+import type { Article } from '~/types/database.types'
 
 useHead({
   title: 'Admin',
