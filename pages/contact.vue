@@ -50,6 +50,7 @@ let widgetId: string | null = null;
 // This must be moved to a server endpoint (Nuxt server route) to prevent bypass.
 
 onMounted(() => {
+  console.log('🔍 Nuxt Public Config:', useRuntimeConfig().public);
   // 1. Check if the key exists before doing ANYTHING
   const siteKey = config.public.turnstileSiteKey || config.public.turnstile?.siteKey;
 

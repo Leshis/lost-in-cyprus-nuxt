@@ -28,7 +28,7 @@ export default defineNuxtConfig({
     //   },
     // },
     public: {
-    supabaseUrl: '', // Nuxt will automatically check NUXT_PUBLIC_SUPABASE_URL
+    supabaseUrl: process.env.SUPABASE_URL,
     emailjsServiceId: '', // Checks NUXT_PUBLIC_EMAILJS_SERVICE_ID
     emailjsTemplateId: '', // Checks NUXT_PUBLIC_EMAILJS_TEMPLATE_ID
     emailjsPublicKey: '', // Checks NUXT_PUBLIC_EMAILJS_PUBLIC_KEY
