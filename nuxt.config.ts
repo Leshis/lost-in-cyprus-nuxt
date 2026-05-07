@@ -17,16 +17,25 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/main.css'],
   runtimeConfig: {
+    // public: {
+    //   supabaseUrl: process.env.SUPABASE_URL,
+    //   emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID,
+    //   emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+    //   emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY,
+    //   // If using the official Nuxt Turnstile module, it usually expects this structure:
+    //   turnstile: {
+    //     siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
+    //   },
+    // },
     public: {
-      supabaseUrl: process.env.SUPABASE_URL,
-      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID,
-      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID,
-      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY,
-      // If using the official Nuxt Turnstile module, it usually expects this structure:
-      turnstile: {
-        siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
-      },
+    supabaseUrl: '', // Nuxt will automatically check NUXT_PUBLIC_SUPABASE_URL
+    emailjsServiceId: '', // Checks NUXT_PUBLIC_EMAILJS_SERVICE_ID
+    emailjsTemplateId: '', // Checks NUXT_PUBLIC_EMAILJS_TEMPLATE_ID
+    emailjsPublicKey: '', // Checks NUXT_PUBLIC_EMAILJS_PUBLIC_KEY
+    turnstile: {
+      siteKey: '', // Checks NUXT_PUBLIC_TURNSTILE_SITE_KEY
     },
+  },
   },
   app: {
     baseURL: '/',
