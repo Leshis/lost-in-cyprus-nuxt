@@ -60,8 +60,9 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         if (!extractedLat && article.location) {
             const coords = article.location.match(/-?\d+\.\d+/g)
             if (coords && coords.length >= 2) {
-                extractedLong = parseFloat(coords[0])
-                extractedLat = parseFloat(coords[1])
+                const [lng, lat] = coords
+                extractedLong = parseFloat(lng!)
+                extractedLat = parseFloat(lat!)
             }
         }
 

@@ -32,10 +32,10 @@ const articleStore = useArticleStore()
 
 const isLoading = ref(false)
 const isPreview = route.name === 'ArticlePreview'
-const error = ref<string | null>(null)
+const error = computed(() => articleStore.error)
 
 const currentSlug = computed(() => route.params.slug as string)
-const article = computed(() => articleStore.getArticleBySlug(currentSlug.value))
+const article = computed(() => articleStore.getPublishedArticleBySlug(currentSlug.value))
 
 useHead({
   title: () => article.value?.title ?? 'Secret',
@@ -65,10 +65,9 @@ useHead({
 
 const loadData = async (slug: string) => {
   if (!slug || slug === 'undefined') return
-  if (articleStore.getArticleBySlug(slug)) return
+  if (articleStore.getArticleBySlug(slug)?.content) return
 
   isLoading.value = true
-  error.value = null
 
   try {
     if (isPreview) {
@@ -76,8 +75,6 @@ const loadData = async (slug: string) => {
     } else {
       await articleStore.fetchArticleBySlug(slug)
     }
-  } catch (err) {
-    error.value = 'Failed to load this secret. Please try again.'
   } finally {
     isLoading.value = false
   }
