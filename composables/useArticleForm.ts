@@ -81,16 +81,32 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         isError.value = false
     }
 
+    const MAX_FILE_SIZE_MB = 10
+    const MAX_DIMENSION = 1200 
+
     const handleFileChange = async (event: Event) => {
         const target = event.target as HTMLInputElement
         const file = target.files?.[0]
         if (!file) return
 
+        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+            statusMsg.value = `Image must be under ${MAX_FILE_SIZE_MB}MB.`
+            isError.value = true
+            target.value = '' 
+            return
+        }
+
         const bitmap = await createImageBitmap(file)
+
+        const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height))
+        const width = Math.round(bitmap.width * scale)
+        const height = Math.round(bitmap.height * scale)
+
         const canvas = document.createElement('canvas')
-        canvas.width = bitmap.width
-        canvas.height = bitmap.height
-        canvas.getContext('2d')!.drawImage(bitmap, 0, 0)
+        canvas.width = width
+        canvas.height = height
+        canvas.getContext('2d')!.drawImage(bitmap, 0, 0, width, height)
+        bitmap.close() 
 
         const webpBlob = await new Promise<Blob | null>(resolve =>
             canvas.toBlob(resolve, 'image/webp', 0.85)
