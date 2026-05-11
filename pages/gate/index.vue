@@ -248,9 +248,15 @@ const handleLogout = async () => {
 }
 
 @media (max-width: 600px) {
+  .tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .tabs button {
-    padding: 0.5rem 0.85rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
     font-size: 0.8rem;
+    text-align: center;
   }
 }
 

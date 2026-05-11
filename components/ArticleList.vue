@@ -20,7 +20,8 @@
         <StatusBadge :status="resolveStatus(article)" />
         <div class="col-actions">
           <button class="btn-sm btn-sm-edit" @click="$emit('edit', article)">Edit</button>
-          <NuxtLink :to="`/gate/preview/${article.slug}`" target="_blank">Preview</NuxtLink>
+          <NuxtLink :to="`/gate/preview/${article.slug}`" target="_blank" class="btn-sm btn-sm-preview">Preview
+          </NuxtLink>
           <button class="btn-sm btn-sm-delete" @click="$emit('delete', article.id)">Delete</button>
         </div>
       </li>
@@ -146,7 +147,17 @@ export default defineComponent({ name: 'ManageArticles' })
 
 .col-actions {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .col-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    width: auto;
+  }
 }
 
 /* ─── Desktop: grid mimics a table ───────────────────────────────────────── */
