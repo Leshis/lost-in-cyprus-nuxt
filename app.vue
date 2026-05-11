@@ -54,6 +54,19 @@ onUnmounted(() => {
   window.removeEventListener('unhandledrejection', markErrored)
 })
 
+const requestURL = useRequestURL()
+const ogImageUrl = new URL('/lost-in-Cyprus.png', requestURL.origin).toString()
+
+useSeoMeta({
+  title: 'Lost in Cyprus - Explore the Island',
+  description: 'Discover hidden gems must-see locations across Cyprus with our interactive map.',
+  ogTitle: 'Lost in Cyprus',
+  ogDescription: 'Discover hidden gems across Cyprus.',
+  ogImage: ogImageUrl,
+  twitterImage: ogImageUrl,
+  twitterCard: 'summary_large_image',
+})
+
 </script>
 
 <style scoped>
