@@ -1,6 +1,7 @@
 <template>
   <div class="map-content-area">
     <svg
+      ref="svgEl"
       :viewBox="viewBox"
       preserveAspectRatio="xMidYMid meet"
       xmlns="http://www.w3.org/2000/svg"
@@ -20,14 +21,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { useMapStore } from '@/stores/mapStore';
 import { districts } from '@/assets/data/districts';
 
 type DistrictClass = 'district-default' | 'district-active' | 'district-dimmed';
 
 const mapStore = useMapStore();
+const svgEl = ref<SVGSVGElement | null>(null);
 const viewBox = ref<string>('0 0 700 400');
+
+onMounted(async () => {
+  await nextTick();
+
+  const svg = svgEl.value;
+  if (!svg) return;
+
+  const bbox = svg.getBBox();
+  if (!bbox.width || !bbox.height) return;
+
+  const padding = 20;
+  viewBox.value = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
+});
 
 const getDistrictClass = (id: string): DistrictClass => {
   const selected = mapStore.selectedDistrict;
