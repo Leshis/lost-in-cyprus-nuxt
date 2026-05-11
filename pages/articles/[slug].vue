@@ -31,11 +31,15 @@ const router = useRouter()
 const articleStore = useArticleStore()
 
 const isLoading = ref(false)
-const isPreview = route.name === 'ArticlePreview'
-const error = ref<string | null>(null)
+const isPreview = computed(() => route.name === 'ArticlePreview')
+const error = computed(() => articleStore.error)
 
 const currentSlug = computed(() => route.params.slug as string)
-const article = computed(() => articleStore.getArticleBySlug(currentSlug.value))
+const article = computed(() =>
+  isPreview.value
+    ? articleStore.getArticleBySlug(currentSlug.value)
+    : articleStore.getPublishedArticleBySlug(currentSlug.value)
+)
 
 useHead({
   title: () => article.value?.title ?? 'Secret',
@@ -49,41 +53,42 @@ useHead({
     },
   ],
   script: [
-  {
-    type: 'application/ld+json',
-    innerHTML: () => JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: article.value?.title,
-      description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
-      image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-      datePublished: article.value?.created_at,
-    }),
-  },
-],
+     {
+      type: 'application/ld+json',
+      textContent: () =>
+        JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: article.value?.title,
+          description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
+          image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+          datePublished: article.value?.created_at,
+        }).replace(/</g, '\\u003C'),
+    },
+  ],
 })
 
 const loadData = async (slug: string) => {
   if (!slug || slug === 'undefined') return
-  if (articleStore.getArticleBySlug(slug)) return
+  const cached = isPreview.value
+    ? articleStore.getArticleBySlug(slug)
+    : articleStore.getPublishedArticleBySlug(slug)
+  if (cached?.content) return
 
   isLoading.value = true
-  error.value = null
 
   try {
-    if (isPreview) {
+    if (isPreview.value) {
       await articleStore.fetchArticleBySlugAdmin(slug)
     } else {
       await articleStore.fetchArticleBySlug(slug)
     }
-  } catch (err) {
-    error.value = 'Failed to load this secret. Please try again.'
   } finally {
     isLoading.value = false
   }
 }
 
-watch(currentSlug, (slug) => loadData(slug), { immediate: true })
+watch([currentSlug, isPreview], ([slug]) => loadData(slug), { immediate: true })
 
 const goBack = () => {
   if (window.history.length > 2) {
@@ -131,11 +136,15 @@ const goBack = () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error state */
-.error-state { gap: 1.25rem; }
+.error-state {
+  gap: 1.25rem;
+}
 
 .error-message {
   font-size: 1rem;
