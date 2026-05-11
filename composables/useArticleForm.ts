@@ -90,6 +90,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         if (!file) return
 
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+            selectedFile.value = null
             statusMsg.value = `Image must be under ${MAX_FILE_SIZE_MB}MB.`
             isError.value = true
             target.value = '' 

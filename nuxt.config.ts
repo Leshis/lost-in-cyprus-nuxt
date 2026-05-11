@@ -15,9 +15,9 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'My Nuxt App',
-      short_name: 'NuxtApp',
-      description: 'My Awesome Nuxt PWA',
+      name: 'Lost in Cyprus',
+      short_name: 'Lost in Cyprus',
+      description: 'Discover hidden gems and authentic experiences in Cyprus',
       theme_color: '#ffffff',
       background_color: '#ffffff',
       display: 'standalone',
