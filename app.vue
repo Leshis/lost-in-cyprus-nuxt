@@ -54,6 +54,15 @@ onUnmounted(() => {
   window.removeEventListener('unhandledrejection', markErrored)
 })
 
+useSeoMeta({
+  title: 'Lost in Cyprus - Explore the Island',
+  description: 'Discover hidden gems must-see locations across Cyprus with our interactive map.',
+  ogTitle: 'Lost in Cyprus',
+  ogDescription: 'Discover hidden gems across Cyprus.',
+  ogImage: '/lost-in-Cyprus.png',
+  twitterCard: 'summary_large_image',
+})
+
 </script>
 
 <style scoped>
