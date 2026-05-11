@@ -10,7 +10,6 @@ export const useMapStore = defineStore('map', {
   }),
   
   actions: {
-    // 3. Define the parameter type
     setSelectedDistrict(districtId: string | null) {
       this.selectedDistrict = districtId
     }
