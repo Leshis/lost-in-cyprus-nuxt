@@ -31,11 +31,15 @@ const router = useRouter()
 const articleStore = useArticleStore()
 
 const isLoading = ref(false)
-const isPreview = route.name === 'ArticlePreview'
+const isPreview = computed(() => route.name === 'ArticlePreview')
 const error = computed(() => articleStore.error)
 
 const currentSlug = computed(() => route.params.slug as string)
-const article = computed(() => articleStore.getPublishedArticleBySlug(currentSlug.value))
+const article = computed(() =>
+  isPreview.value
+    ? articleStore.getArticleBySlug(currentSlug.value)
+    : articleStore.getPublishedArticleBySlug(currentSlug.value)
+)
 
 useHead({
   title: () => article.value?.title ?? 'Secret',
@@ -49,28 +53,31 @@ useHead({
     },
   ],
   script: [
-  {
-    type: 'application/ld+json',
-    innerHTML: () => JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      headline: article.value?.title,
-      description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
-      image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-      datePublished: article.value?.created_at,
-    }),
-  },
-],
+    {
+      type: 'application/ld+json',
+      innerHTML: () => JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: article.value?.title,
+        description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
+        image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+        datePublished: article.value?.created_at,
+      }),
+    },
+  ],
 })
 
 const loadData = async (slug: string) => {
   if (!slug || slug === 'undefined') return
-  if (articleStore.getArticleBySlug(slug)?.content) return
+  const cached = isPreview.value
+    ? articleStore.getArticleBySlug(slug)
+    : articleStore.getPublishedArticleBySlug(slug)
+  if (cached?.content) return
 
   isLoading.value = true
 
   try {
-    if (isPreview) {
+    if (isPreview.value) {
       await articleStore.fetchArticleBySlugAdmin(slug)
     } else {
       await articleStore.fetchArticleBySlug(slug)
@@ -128,11 +135,15 @@ const goBack = () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error state */
-.error-state { gap: 1.25rem; }
+.error-state {
+  gap: 1.25rem;
+}
 
 .error-message {
   font-size: 1rem;

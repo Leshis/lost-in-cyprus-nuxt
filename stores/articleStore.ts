@@ -69,7 +69,7 @@ export const useArticleStore = defineStore('articles', {
         const { data, error } = await supabase
           .from('articles')
           .select('id, title, slug, district, category, is_published, scheduled_from, scheduled_to, image_url, created_at')
-
+          .order('created_at', { ascending: false })
         if (error) throw error
 
         const existingById = new Map(this.items.map((i) => [i.id, i]))
