@@ -53,16 +53,17 @@ useHead({
     },
   ],
   script: [
-    {
+     {
       type: 'application/ld+json',
-      innerHTML: () => JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: article.value?.title,
-        description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
-        image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-        datePublished: article.value?.created_at,
-      }),
+      textContent: () =>
+        JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Article',
+          headline: article.value?.title,
+          description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
+          image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+          datePublished: article.value?.created_at,
+        }).replace(/</g, '\\u003C'),
     },
   ],
 })
