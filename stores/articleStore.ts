@@ -1,18 +1,17 @@
 import { defineStore } from 'pinia'
 import type { Article } from '~/types/database.types'
 
-// ✅ Honest type for list queries that omit content
 type ArticleSummary = Omit<Article, 'content'>
 
-const LIST_TTL = 5 * 60 * 1000   // 5 min for full list
-const SLUG_TTL = 60 * 1000       // 1 min for individual article cache
+const LIST_TTL = 5 * 60 * 1000  
+const SLUG_TTL = 60 * 1000      
 
 interface ArticleState {
   items: Article[]
   loading: boolean
   error: string | null
   lastFetched: number | null
-  lastSlugFetched: Record<string, number>  // ✅ Per-slug timestamps
+  lastSlugFetched: Record<string, number>  
 }
 
 export const useArticleStore = defineStore('articles', {
@@ -30,13 +29,11 @@ export const useArticleStore = defineStore('articles', {
         state.items.find((item) => item.id === Number(id))
     },
 
-    // Raw lookup — admin context only
     getArticleBySlug: (state) => {
       return (slug: string): Article | undefined =>
         state.items.find((item) => item.slug === slug)
     },
 
-    // Safe public lookup — respects published state & scheduling
     getPublishedArticleBySlug: (state) => {
       return (slug: string): Article | undefined => {
         const now = new Date()
@@ -73,10 +70,8 @@ export const useArticleStore = defineStore('articles', {
           .from('articles')
           .select('id, title, slug, district, category, is_published, scheduled_from, scheduled_to, image_url, created_at')
           .order('created_at', { ascending: false })
-
         if (error) throw error
 
-        // ✅ O(n) merge — preserve any already-fetched full content
         const existingById = new Map(this.items.map((i) => [i.id, i]))
         const incoming = (data ?? []) as ArticleSummary[]
         this.items = incoming.map((fresh) => {
@@ -95,8 +90,6 @@ export const useArticleStore = defineStore('articles', {
 
     async fetchArticleBySlug(slug: string): Promise<void> {
       const supabase = useSupabaseClient()
-
-      // ✅ Time-bounded cache — re-fetch if content might be stale or unpublished
       const lastFetched = this.lastSlugFetched[slug] ?? null
       const cacheIsFresh = lastFetched !== null && Date.now() - lastFetched < SLUG_TTL
       const cached = this.getPublishedArticleBySlug(slug)
@@ -129,7 +122,6 @@ export const useArticleStore = defineStore('articles', {
           this.items.splice(index, 1)
         }
 
-        // ✅ Track per-slug fetch time, not the list timestamp
         this.lastSlugFetched[slug] = Date.now()
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to fetch article'
@@ -176,7 +168,6 @@ export const useArticleStore = defineStore('articles', {
       await this.fetchArticles(true)
     },
 
-    // ✅ Call on sign-out to prevent stale auth'd content persisting
     clearCache(): void {
       this.items = []
       this.lastFetched = null
