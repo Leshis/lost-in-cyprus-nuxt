@@ -87,7 +87,7 @@ const loadData = async (slug: string) => {
   }
 }
 
-watch(currentSlug, (slug) => loadData(slug), { immediate: true })
+watch([currentSlug, isPreview], ([slug]) => loadData(slug), { immediate: true })
 
 const goBack = () => {
   if (window.history.length > 2) {
