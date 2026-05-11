@@ -30,6 +30,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
     const resetForm = () => {
         editingId.value = null
+        selectedFile.value = null
         isSlugCustom.value = false
         Object.assign(form, EMPTY_FORM)
         if (statusMsg) statusMsg.value = ''
@@ -122,7 +123,11 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
             statusMsg.value = newPublishState ? 'Article published.' : 'Article unpublished.'
 
             await onSuccess()
-            setTimeout(() => resetForm(), 1500)
+
+            setTimeout(() => {
+                statusMsg.value = ''
+                isError.value = false
+            }, 3000)
         } catch (err) {
             isError.value = true
             statusMsg.value = err instanceof Error
@@ -193,7 +198,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
                 statusMsg.value = publish ? 'Article published!' : 'Draft saved!'
             } else {
-                if (!imagePath) throw new Error('Please select an image.')
+                if (publish && !imagePath) throw new Error('Please select an image.')
                 const { error } = await (supabase.from('articles') as any)
                     .insert([{ ...articlePayload, image_url: imagePath }])
 
