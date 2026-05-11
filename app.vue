@@ -32,14 +32,6 @@ const markErrored = (event: any) => {
 
   // Log the specific details to the console
   console.error("🔥 Global Error Caught!");
-  
-  if (event.type === 'unhandledrejection') {
-    console.log("Reason:", event.reason); // Detailed promise rejection info
-  } else if (event.error) {
-    console.log("Error Object:", event.error); // The actual JS error stack
-  } else {
-    console.log("Event Data:", event);
-  }
 }
 
 onMounted(() => {
