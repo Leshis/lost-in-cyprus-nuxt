@@ -7,40 +7,66 @@ export default defineNuxtConfig({
     ['@nuxtjs/supabase', {
       types: null,
       redirect: false
-      // redirectOptions: {
-      //   login: '/login',
-      //   callback: '/confirm',
-      //   include: ['/gate', '/gate/preview/*'],
-      // },
     }],
     '@pinia/nuxt',
+    '@vite-pwa/nuxt', // <--- ADD THIS
   ],
+  
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Lost in Cyprus',
+      short_name: 'Lost in Cyprus',
+      description: 'Discover hidden gems and authentic experiences in Cyprus',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
+      display: 'standalone',
+      icons: [
+        {
+          src: 'pwa-192x192.png',
+          sizes: '192x192',
+          type: 'image/png'
+        },
+        {
+          src: 'pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png'
+        },
+        {
+          src: 'pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        }
+      ]
+    },
+    workbox: {
+      navigateFallback: '/'
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    }
+  },
   css: ['~/assets/main.css'],
   runtimeConfig: {
-    // public: {
-    //   supabaseUrl: process.env.SUPABASE_URL,
-    //   emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID,
-    //   emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID,
-    //   emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY,
-    //   // If using the official Nuxt Turnstile module, it usually expects this structure:
-    //   turnstile: {
-    //     siteKey: process.env.NUXT_PUBLIC_TURNSTILE_SITE_KEY,
-    //   },
-    // },
     public: {
-    supabaseUrl: process.env.SUPABASE_URL,
-    emailjsServiceId: '', // Checks NUXT_PUBLIC_EMAILJS_SERVICE_ID
-    emailjsTemplateId: '', // Checks NUXT_PUBLIC_EMAILJS_TEMPLATE_ID
-    emailjsPublicKey: '', // Checks NUXT_PUBLIC_EMAILJS_PUBLIC_KEY
-    turnstile: {
-      siteKey: '', // Checks NUXT_PUBLIC_TURNSTILE_SITE_KEY
+      supabaseUrl: process.env.SUPABASE_URL,
+      emailjsServiceId: '',
+      emailjsTemplateId: '',
+      emailjsPublicKey: '',
+      turnstile: {
+        siteKey: '',
+      },
     },
-  },
   },
   app: {
     baseURL: '/',
     head: {
       htmlAttrs: { lang: 'en' },
+      meta: [
+        { name: 'theme-color', content: '#ffffff' } // Fixes "Does not set a theme color"
+      ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
@@ -49,6 +75,7 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
         },
         { rel: 'icon', href: '/lost-in-cyprus.webp' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } // Fixes "apple-touch-icon" error
       ],
     },
   },

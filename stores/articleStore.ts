@@ -3,15 +3,15 @@ import type { Article } from '~/types/database.types'
 
 type ArticleSummary = Omit<Article, 'content'>
 
-const LIST_TTL = 5 * 60 * 1000  
-const SLUG_TTL = 60 * 1000      
+const LIST_TTL = 5 * 60 * 1000
+const SLUG_TTL = 60 * 1000
 
 interface ArticleState {
   items: Article[]
   loading: boolean
   error: string | null
   lastFetched: number | null
-  lastSlugFetched: Record<string, number>  
+  lastSlugFetched: Record<string, number>
 }
 
 export const useArticleStore = defineStore('articles', {
@@ -168,6 +168,10 @@ export const useArticleStore = defineStore('articles', {
       this.items = []
       this.lastFetched = null
       this.lastSlugFetched = {}
+    },
+
+    clearError(): void {
+      this.error = null
     },
   },
 })
