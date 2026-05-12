@@ -2,14 +2,16 @@
   <div class="article-page">
     <header class="article-hero">
       <img
-        v-if="article.image_url"
-        :src="getImageUrl(article.image_url)"
-        :srcset="getImageSrcset(article.image_url)"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
-        :alt="article.title"
-        class="hero-bg-img"
-        fetchpriority="high"
-      />
+    v-if="article.image_url"
+    :src="getImageUrl(article.image_url)"
+    :srcset="getImageSrcset(article.image_url)"
+    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+    :alt="article.alt_text || article.title"
+    class="hero-bg-img"
+    fetchpriority="high"
+    width="1200"
+    height="600"
+  />
       <div v-else class="hero-bg-img fallback-bg" />
 
       <!-- Back button lives in its own bar, separate from the hero text -->
