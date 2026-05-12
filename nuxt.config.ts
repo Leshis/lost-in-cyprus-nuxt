@@ -122,5 +122,10 @@ export default defineNuxtConfig({
   },
   experimental: {
     viteEnvironmentApi: true
+  },
+  vite: {
+    build: {
+      sourcemap: false
+    }
   }
 })
