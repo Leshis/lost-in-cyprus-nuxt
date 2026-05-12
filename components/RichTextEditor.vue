@@ -228,9 +228,14 @@ function insertImage() {
     : align === 'right' ? 'img-right'
     : 'img-left'
 
+  const img = document.createElement('img')
+  img.src = url
+  img.alt = alt
+  img.className = `rte-inserted-img ${alignClass}`
+
   document.execCommand(
     'insertHTML', false,
-    `<img src="${url}" alt="${alt}" class="rte-inserted-img ${alignClass}" /><span>\u200B</span>`
+    `${img.outerHTML}<span>\u200B</span>`
   )
 
   showImageModal.value = false
