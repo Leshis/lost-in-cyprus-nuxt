@@ -131,6 +131,10 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         if (!editingId.value) return
         const newPublishState = !form.is_published
 
+        if (newPublishState && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+            throw new Error('Please provide an image description (Alt Text) before publishing.')
+        }
+        
         try {
             uploading.value = true
             statusMsg.value = newPublishState ? 'Publishing...' : 'Unpublishing...'
@@ -174,8 +178,8 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const oldImagePath = editingId.value ? form.image_url : null
 
-            if (publish && (selectedFile.value || form.image_url) && !form.alt_text) {
-                throw new Error('Please provide and image description (Alt Text) for SEO')
+            if (publish && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+                throw new Error('Please provide an image description (Alt Text) before publishing.')
             }
             
             let imagePath: string | undefined
