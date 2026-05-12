@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     'nuxt-schema-org'
   ],
   site: {
-    url: 'lostincyprus.netlify.app',
+    url: 'https://lostincyprus.netlify.app',
     name: 'Lost in Cyprus'
   },
   pwa: {
