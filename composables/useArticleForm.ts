@@ -1,4 +1,4 @@
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onBeforeUnmount } from 'vue'
 import type { Article } from '~/types/database.types'
 
 export type ArticleFormFields = Omit<Article, 'id' | 'created_at'>
@@ -27,8 +27,12 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
     const selectedFile = ref<File | null>(null)
     const editingId = ref<number | null>(null)
     const isSlugCustom = ref(false)
+    const resetTimerId = ref<ReturnType<typeof setTimeout> | null>(null)
+    const statusTimerId = ref<ReturnType<typeof setTimeout> | null>(null)
 
     const resetForm = () => {
+        if (resetTimerId.value) clearTimeout(resetTimerId.value)
+        if (statusTimerId.value) clearTimeout(statusTimerId.value)
         editingId.value = null
         selectedFile.value = null
         isSlugCustom.value = false
@@ -82,7 +86,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
     }
 
     const MAX_FILE_SIZE_MB = 10
-    const MAX_DIMENSION = 1200 
+    const MAX_DIMENSION = 1200
 
     const handleFileChange = async (event: Event) => {
         const target = event.target as HTMLInputElement
@@ -93,7 +97,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
             selectedFile.value = null
             statusMsg.value = `Image must be under ${MAX_FILE_SIZE_MB}MB.`
             isError.value = true
-            target.value = '' 
+            target.value = ''
             return
         }
 
@@ -107,7 +111,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         canvas.width = width
         canvas.height = height
         canvas.getContext('2d')!.drawImage(bitmap, 0, 0, width, height)
-        bitmap.close() 
+        bitmap.close()
 
         const webpBlob = await new Promise<Blob | null>(resolve =>
             canvas.toBlob(resolve, 'image/webp', 0.85)
@@ -141,7 +145,8 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             await onSuccess()
 
-            setTimeout(() => {
+            if (statusTimerId.value) clearTimeout(statusTimerId.value)
+            statusTimerId.value = setTimeout(() => {
                 statusMsg.value = ''
                 isError.value = false
             }, 3000)
@@ -191,6 +196,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
                 long: form.long,
                 scheduled_from: form.scheduled_from || null,
                 scheduled_to: form.scheduled_to || null,
+                affiliate_url: form.affiliate_url,
                 is_published: publish,
             }
 
@@ -224,7 +230,14 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
             }
 
             await onSuccess()
-            setTimeout(() => { resetForm() }, 1500)
+            if (!editingId.value) {
+                if (resetTimerId.value) clearTimeout(resetTimerId.value)
+                resetTimerId.value = setTimeout(() => { resetForm() }, 1500)
+            } else {
+                // On edit: clear status message only, keep the form populated
+                if (statusTimerId.value) clearTimeout(statusTimerId.value)
+                statusTimerId.value = setTimeout(() => { statusMsg.value = ''; isError.value = false }, 3000)
+            }
 
         } catch (err) {
             isError.value = true
@@ -233,6 +246,11 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
             uploading.value = false
         }
     }
+
+    onBeforeUnmount(() => {
+        if (resetTimerId.value) clearTimeout(resetTimerId.value)
+        if (statusTimerId.value) clearTimeout(statusTimerId.value)
+    })
 
     return {
         form, isSlugCustom, uploading, statusMsg, isError,

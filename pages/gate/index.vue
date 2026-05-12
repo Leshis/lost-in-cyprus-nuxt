@@ -92,7 +92,7 @@ const supabase = useSupabaseClient()
 const router = useRouter()
 const activeTab = ref<'list' | 'create'>('list')
 
-const { articles, categories, districts, fetchArticles } = useAdminArticles()
+const { articles, categories, districts, fetchArticles, fetchArticleById } = useAdminArticles()
 
 const {
   form, isSlugCustom, uploading, statusMsg, isError, editingId,
@@ -120,8 +120,14 @@ const switchToCreate = () => {
   activeTab.value = 'create'
 }
 
-const handleEditAndSwitch = (article: Article) => {
-  handleEdit(article)
+const handleEditAndSwitch = async (article: Article) => {
+  const full = await fetchArticleById(article.id)
+  if (!full) {
+    statusMsg.value = 'Failed to load article'
+    isError.value = true
+    return
+  }
+  handleEdit(full)
   activeTab.value = 'create'
 }
 
