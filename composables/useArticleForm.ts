@@ -174,6 +174,10 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const oldImagePath = editingId.value ? form.image_url : null
 
+            if (publish && (selectedFile.value || form.image_url) && !form.alt_text) {
+                throw new Error('Please provide and image description (Alt Text) for SEO')
+            }
+            
             let imagePath: string | undefined
             if (selectedFile.value) {
                 const ext = selectedFile.value.name.split('.').pop()
