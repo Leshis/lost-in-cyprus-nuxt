@@ -11,7 +11,7 @@ export function useAdminArticles() {
     const fetchArticles = async (): Promise<void> => {
         const { data, error } = await supabase
             .from('articles')
-            .select('*')
+            .select('id, title, slug, district, category, is_published, scheduled_from, scheduled_to, image_url, created_at, affiliate_url')
             .order('created_at', { ascending: false })
 
         if (error) {
@@ -47,10 +47,24 @@ export function useAdminArticles() {
         }
     }
 
+    const fetchArticleById = async (id: number): Promise<Article | null> => {
+        const { data, error } = await supabase
+            .from('articles')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+        if (error) {
+            console.error('Failed to fetch article for editing:', error.message)
+            return null
+        }
+        return data as Article
+    }
+
     onMounted(() => {
         fetchArticles()
         fetchEnums()
     })
 
-    return { articles, categories, districts, fetchArticles }
+    return { articles, categories, districts, fetchArticles,fetchArticleById }
 }
