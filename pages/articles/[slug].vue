@@ -41,32 +41,44 @@ const article = computed(() =>
     : articleStore.getPublishedArticleBySlug(currentSlug.value)
 )
 
-useHead({
-  title: () => article.value?.title ?? 'Secret',
-  meta: [
-    {
-      name: 'description',
-      content: () =>
-        article.value?.content
-          ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
-          : 'Discover local secrets',
-    },
-  ],
-  script: [
-     {
-      type: 'application/ld+json',
-      textContent: () =>
-        JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Article',
-          headline: article.value?.title,
-          description: article.value?.content?.replace(/<[^>]*>/g, '').slice(0, 155),
-          image: article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-          datePublished: article.value?.created_at,
-        }).replace(/</g, '\\u003C'),
-    },
-  ],
+const articleDescription = computed(() =>
+  article.value?.content
+    ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
+    : 'Discover hidden gems and local secrets across Cyprus.'
+)
+
+const siteBaseUrl = computed(() => {
+  const raw = String(useSiteConfig().url ?? '').replace(/\/+$/, '')
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
 })
+
+useSeoMeta({
+  title: () => article.value?.title ? `Lost in Cyprus – ${article.value.title}` : 'Lost in Cyprus',
+  description: articleDescription,
+
+  // Open Graph (Facebook, WhatsApp, etc.)
+  ogType: 'article',
+  ogTitle: () => article.value?.title ?? 'Lost in Cyprus',
+  ogDescription: articleDescription,
+  ogImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+  ogUrl: () => `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
+
+  // Twitter / X
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => article.value?.title ?? 'Lost in Cyprus',
+  twitterDescription: articleDescription,
+  twitterImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+})
+
+useSchemaOrg([
+  defineArticle({
+    headline: () => article.value?.title ?? '',
+    description: articleDescription,
+    image: () => article.value?.image_url ? getImageUrl(article.value.image_url) : '',
+    datePublished: () => article.value?.created_at ?? '',
+    dateModified: () => article.value?.created_at ?? '',
+  })
+])
 
 const loadData = async (slug: string) => {
   if (!slug || slug === 'undefined') return

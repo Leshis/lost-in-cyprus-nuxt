@@ -9,9 +9,13 @@ export default defineNuxtConfig({
       redirect: false
     }],
     '@pinia/nuxt',
-    '@vite-pwa/nuxt', // <--- ADD THIS
+    '@vite-pwa/nuxt',
+    'nuxt-schema-org'
   ],
-  
+  site: {
+    url: 'https://lostincyprus.netlify.app',
+    name: 'Lost in Cyprus'
+  },
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
