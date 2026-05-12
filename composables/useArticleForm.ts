@@ -189,6 +189,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const articlePayload = {
                 title: form.title,
+                alt_text: form.alt_text,
                 slug: form.slug,
                 district: form.district,
                 content: form.content.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '<h2>$1</h2>'),
