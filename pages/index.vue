@@ -70,8 +70,8 @@
               :loading="index === 0 ? 'eager' : 'lazy'"
               sizes="(max-width: 1024px) 100vw, 50vw"
               :alt="loc.title"
-              width: "400"
-              height: "160"
+              width="400"
+              height="160"
               class="card-img"
             />
 
