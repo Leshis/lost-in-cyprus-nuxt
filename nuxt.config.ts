@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     'nuxt-schema-org'
   ],
   security: {
+    nonce: true,
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],
