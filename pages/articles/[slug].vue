@@ -70,15 +70,19 @@ useSeoMeta({
   twitterImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
 })
 
-useSchemaOrg([
-  defineArticle({
-    headline: () => article.value?.title ?? '',
-    description: articleDescription,
-    image: () => article.value?.image_url ? getImageUrl(article.value.image_url) : '',
-    datePublished: () => article.value?.created_at ?? '',
-    dateModified: () => article.value?.created_at ?? '',
-  })
-])
+useSchemaOrg(() => {
+  if (!article.value) return []
+
+  return [
+    defineArticle({
+      headline: article.value.title,
+      description: articleDescription.value,
+      image: article.value.image_url ? getImageUrl(article.value.image_url) : undefined,
+      datePublished: article.value.created_at,
+      dateModified: article.value.created_at,
+    })
+  ]
+})
 
 const loadData = async (slug: string) => {
   if (!slug || slug === 'undefined') return

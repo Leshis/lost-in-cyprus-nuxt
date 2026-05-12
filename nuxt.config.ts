@@ -68,8 +68,18 @@ export default defineNuxtConfig({
     baseURL: '/',
     head: {
       htmlAttrs: { lang: 'en' },
+      title: 'Lost in Cyprus',
       meta: [
-        { name: 'theme-color', content: '#ffffff' } // Fixes "Does not set a theme color"
+        { name: 'theme-color', content: '#ffffff' }, // Fixes "Does not set a theme color"
+        { name: 'description', content: 'Discover hidden gems and authentic experiences in Cyprus' },
+        { property: 'og:title', content: 'Lost in Cyprus' },
+        { property: 'og:description', content: 'Discover hidden gems and authentic experiences in Cyprus' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:url', content: 'https://lostincyprus.netlify.app' },
+        { property: 'og:site_name', content: 'Lost in Cyprus' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:title', content: 'Lost in Cyprus' },
+        { name: 'twitter:description', content: 'Discover hidden gems and authentic experiences in Cyprus' }
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -79,7 +89,8 @@ export default defineNuxtConfig({
           href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
         },
         { rel: 'icon', href: '/lost-in-cyprus.webp' },
-        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' } // Fixes "apple-touch-icon" error
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }, // Fixes "apple-touch-icon" error
+        { rel: 'canonical', href: 'https://lostincyprus.netlify.app' }
       ],
     },
   },

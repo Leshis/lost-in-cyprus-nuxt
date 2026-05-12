@@ -1,4 +1,4 @@
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onBeforeUnmount } from 'vue'
 import type { Article } from '~/types/database.types'
 
 export type ArticleFormFields = Omit<Article, 'id' | 'created_at'>
@@ -27,8 +27,12 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
     const selectedFile = ref<File | null>(null)
     const editingId = ref<number | null>(null)
     const isSlugCustom = ref(false)
+    const resetTimerId = ref<ReturnType<typeof setTimeout> | null>(null)
+    const statusTimerId = ref<ReturnType<typeof setTimeout> | null>(null)
 
     const resetForm = () => {
+        if (resetTimerId.value) clearTimeout(resetTimerId.value)
+        if (statusTimerId.value) clearTimeout(statusTimerId.value)
         editingId.value = null
         selectedFile.value = null
         isSlugCustom.value = false
@@ -141,7 +145,8 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             await onSuccess()
 
-            setTimeout(() => {
+            if (statusTimerId.value) clearTimeout(statusTimerId.value)
+            statusTimerId.value = setTimeout(() => {
                 statusMsg.value = ''
                 isError.value = false
             }, 3000)
@@ -226,10 +231,12 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             await onSuccess()
             if (!editingId.value) {
-                setTimeout(() => { resetForm() }, 1500)
+                if (resetTimerId.value) clearTimeout(resetTimerId.value)
+                resetTimerId.value = setTimeout(() => { resetForm() }, 1500)
             } else {
                 // On edit: clear status message only, keep the form populated
-                setTimeout(() => { statusMsg.value = ''; isError.value = false }, 3000)
+                if (statusTimerId.value) clearTimeout(statusTimerId.value)
+                statusTimerId.value = setTimeout(() => { statusMsg.value = ''; isError.value = false }, 3000)
             }
 
         } catch (err) {
@@ -239,6 +246,11 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
             uploading.value = false
         }
     }
+
+    onBeforeUnmount(() => {
+        if (resetTimerId.value) clearTimeout(resetTimerId.value)
+        if (statusTimerId.value) clearTimeout(statusTimerId.value)
+    })
 
     return {
         form, isSlugCustom, uploading, statusMsg, isError,

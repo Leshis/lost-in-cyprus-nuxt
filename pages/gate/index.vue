@@ -122,7 +122,11 @@ const switchToCreate = () => {
 
 const handleEditAndSwitch = async (article: Article) => {
   const full = await fetchArticleById(article.id)
-  if (!full) return
+  if (!full) {
+    statusMsg.value = 'Failed to load article'
+    isError.value = true
+    return
+  }
   handleEdit(full)
   activeTab.value = 'create'
 }
