@@ -47,6 +47,11 @@ const articleDescription = computed(() =>
     : 'Discover hidden gems and local secrets across Cyprus.'
 )
 
+const siteBaseUrl = computed(() => {
+  const raw = String(useSiteConfig().url ?? '').replace(/\/+$/, '')
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+})
+
 useSeoMeta({
   title: () => article.value?.title ? `Lost in Cyprus – ${article.value.title}` : 'Lost in Cyprus',
   description: articleDescription,
@@ -56,7 +61,7 @@ useSeoMeta({
   ogTitle: () => article.value?.title ?? 'Lost in Cyprus',
   ogDescription: articleDescription,
   ogImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-  ogUrl: () => `https://${useSiteConfig().url}/articles/${currentSlug.value}`,
+  ogUrl: () => `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
 
   // Twitter / X
   twitterCard: 'summary_large_image',
