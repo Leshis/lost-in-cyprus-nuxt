@@ -6,6 +6,7 @@ export type ArticleFormFields = Omit<Article, 'id' | 'created_at'>
 const EMPTY_FORM: ArticleFormFields = {
     title: '',
     slug: '',
+    alt_text: '',
     district: '',
     content: '',
     category: '',
