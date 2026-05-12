@@ -110,14 +110,16 @@ export const useArticleStore = defineStore('articles', {
 
         if (error) throw error
 
+        const index = this.items.findIndex((item) => item.slug === slug)
         if (data) {
           const typed = data as Article
-          const index = this.items.findIndex((item) => item.slug === slug)
           if (index !== -1) {
             this.items[index] = typed
           } else {
             this.items.push(typed)
           }
+        } else if (index !== -1) {
+          this.items.splice(index, 1)
         }
 
         this.lastSlugFetched[slug] = Date.now()
@@ -142,14 +144,16 @@ export const useArticleStore = defineStore('articles', {
           .maybeSingle()
 
         if (error) throw error
+        const index = this.items.findIndex((item) => item.slug === slug)
         if (data) {
           const typed = data as Article
-          const index = this.items.findIndex((item) => item.slug === slug)
           if (index !== -1) {
             this.items[index] = typed
           } else {
             this.items.push(typed)
           }
+        } else if (index !== -1) {
+          this.items.splice(index, 1)
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to fetch article (admin)'
