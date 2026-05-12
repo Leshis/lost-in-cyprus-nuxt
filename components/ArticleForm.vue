@@ -72,8 +72,20 @@
         <span v-if="requireImage" class="required-star">*</span>
       </label>
       <input id="article-image" type="file" accept="image/*" :required="requireImage"
-        @change="$emit('file-change', $event)" />
+        @change="onFileChange" />
     </div>
+
+    <div class="field" v-if="localForm.image_url || pendingFileSelected || requireImage">
+  <label for="article-alt">Image Description (Alt Text) <span class="required-star">*</span></label>
+  <input 
+    id="article-alt" 
+    v-model="localForm.alt_text" 
+    type="text" 
+    placeholder="e.g. A clear view of Blue Lagoon with small boats" 
+    required 
+  />
+  <p class="hint">Help Google "see" this photo for your SEO ranking.</p>
+</div>
 
     <div class="actions">
       <button
@@ -131,6 +143,14 @@ const localForm = computed({
   get: () => props.form,
   set: (val) => emit('update:form', val),
 })
+
+const onFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0){
+    pendingFileSelected.value = true
+  }
+  emit('file-change', event)
+}
 
 </script>
 

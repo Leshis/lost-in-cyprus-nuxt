@@ -6,6 +6,7 @@ export type ArticleFormFields = Omit<Article, 'id' | 'created_at'>
 const EMPTY_FORM: ArticleFormFields = {
     title: '',
     slug: '',
+    alt_text: '',
     district: '',
     content: '',
     category: '',
@@ -130,6 +131,10 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         if (!editingId.value) return
         const newPublishState = !form.is_published
 
+        if (newPublishState && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+            throw new Error('Please provide an image description (Alt Text) before publishing.')
+        }
+        
         try {
             uploading.value = true
             statusMsg.value = newPublishState ? 'Publishing...' : 'Unpublishing...'
@@ -173,6 +178,10 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const oldImagePath = editingId.value ? form.image_url : null
 
+            if (publish && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+                throw new Error('Please provide an image description (Alt Text) before publishing.')
+            }
+            
             let imagePath: string | undefined
             if (selectedFile.value) {
                 const ext = selectedFile.value.name.split('.').pop()
@@ -188,6 +197,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const articlePayload = {
                 title: form.title,
+                alt_text: form.alt_text,
                 slug: form.slug,
                 district: form.district,
                 content: form.content.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '<h2>$1</h2>'),
