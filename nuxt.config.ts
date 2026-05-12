@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     'nuxt-schema-org'
   ],
   security: {
-    nonce: true,
+    enabled: process.env.NODE_ENV === 'production',
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],
