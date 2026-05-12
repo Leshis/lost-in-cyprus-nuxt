@@ -17,6 +17,7 @@
     "dompurify": "^3.4.2",
     "nuxt": "^4.4.4",
     "nuxt-schema-org": "^6.0.4",
+    "nuxt-security": "^2.6.0",
     "vue": "^3.5.33",
     "vue-router": "^5.0.6"
   },
