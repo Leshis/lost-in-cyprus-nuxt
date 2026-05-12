@@ -75,6 +75,18 @@
         @change="$emit('file-change', $event)" />
     </div>
 
+    <div class="field" v-if="localForm.image_url || requireImage">
+  <label for="article-alt">Image Description (Alt Text) <span class="required-star">*</span></label>
+  <input 
+    id="article-alt" 
+    v-model="localForm.alt_text" 
+    type="text" 
+    placeholder="e.g. A clear view of Blue Lagoon with small boats" 
+    required 
+  />
+  <p class="hint">Help Google "see" this photo for your SEO ranking.</p>
+</div>
+
     <div class="actions">
       <button
         type="button"
