@@ -109,10 +109,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue'
+import { computed, ref, defineAsyncComponent } from 'vue'
 import type { ArticleFormFields } from '../composables/useArticleForm'
 
 const RichTextEditor = defineAsyncComponent(() => import('./RichTextEditor.vue'))
+
+const pendingFileSelected = ref(false)
 
 const props = defineProps<{
   form: ArticleFormFields & { is_published?: boolean } // Ensure your type has this property

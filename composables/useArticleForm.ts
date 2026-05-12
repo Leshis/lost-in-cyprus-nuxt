@@ -131,11 +131,11 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         if (!editingId.value) return
         const newPublishState = !form.is_published
 
-        if (newPublishState && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
-            throw new Error('Please provide an image description (Alt Text) before publishing.')
-        }
-        
         try {
+            if (newPublishState && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+                throw new Error('Please provide an image description (Alt Text) before publishing.')
+            }
+
             uploading.value = true
             statusMsg.value = newPublishState ? 'Publishing...' : 'Unpublishing...'
             isError.value = false
