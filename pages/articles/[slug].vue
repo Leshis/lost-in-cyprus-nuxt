@@ -41,41 +41,34 @@ const article = computed(() =>
     : articleStore.getPublishedArticleBySlug(currentSlug.value)
 )
 
-useHead({
-  title: () => article.value?.title ? `Lost in Cyprus – ${article.value.title}` : 'Lost in Cyprus',
-})
+const articleDescription = computed(() =>
+  article.value?.content
+    ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
+    : 'Discover hidden gems and local secrets across Cyprus.'
+)
 
 useSeoMeta({
-  // Basic
   title: () => article.value?.title ? `Lost in Cyprus – ${article.value.title}` : 'Lost in Cyprus',
-  description: () => article.value?.content
-    ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
-    : 'Discover hidden gems and local secrets across Cyprus.',
+  description: articleDescription,
 
   // Open Graph (Facebook, WhatsApp, etc.)
   ogType: 'article',
   ogTitle: () => article.value?.title ?? 'Lost in Cyprus',
-  ogDescription: () => article.value?.content
-    ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
-    : 'Discover hidden gems and local secrets across Cyprus.',
+  ogDescription: articleDescription,
   ogImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-  ogUrl: () => `https://lostincyprus.netlify.app/articles/${currentSlug.value}`,
+  ogUrl: () => `https://${useSiteConfig().url}/articles/${currentSlug.value}`,
 
   // Twitter / X
   twitterCard: 'summary_large_image',
   twitterTitle: () => article.value?.title ?? 'Lost in Cyprus',
-  twitterDescription: () => article.value?.content
-    ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
-    : 'Discover hidden gems and local secrets across Cyprus.',
+  twitterDescription: articleDescription,
   twitterImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
 })
 
 useSchemaOrg([
   defineArticle({
     headline: () => article.value?.title ?? '',
-    description: () => article.value?.content
-      ? article.value.content.replace(/<[^>]*>/g, '').slice(0, 155).trimEnd() + '…'
-      : '',
+    description: articleDescription,
     image: () => article.value?.image_url ? getImageUrl(article.value.image_url) : '',
     datePublished: () => article.value?.created_at ?? '',
     dateModified: () => article.value?.created_at ?? '',
