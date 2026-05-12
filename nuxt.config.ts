@@ -2,8 +2,10 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-06',
   devtools: { enabled: true },
-  ssr: false,
+  ssr: true,
   modules: [
+    '@netlify/nuxt',
+    'nuxt-security',
     ['@nuxtjs/supabase', {
       types: null,
       redirect: false
@@ -12,6 +14,30 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     'nuxt-schema-org'
   ],
+  security: {
+    nonce: true,
+    headers: {
+      contentSecurityPolicy: {
+        'default-src': ["'self'"],
+        'script-src': ["'self'", "'nonce-{{nonce}}'", "https://challenges.cloudflare.com"],
+        'style-src': ["'self'", "'nonce-{{nonce}}'", "https://fonts.googleapis.com"],
+        'font-src': ["'self'", "https://fonts.gstatic.com"],
+        'img-src': ["'self'", "data:", "blob:", "https://*.supabase.co", "https://placehold.jp"],
+        'connect-src': ["'self'", "https://*.supabase.co", "https://api.emailjs.com"],
+        'frame-src': ["https://challenges.cloudflare.com"],
+        'object-src': ["'none'"],
+        'base-uri': ["'self'"],
+      },
+      xFrameOptions: 'SAMEORIGIN',
+      xContentTypeOptions: 'nosniff',
+      referrerPolicy: 'strict-origin-when-cross-origin',
+      permissionsPolicy: {
+        camera: [],
+        microphone: [],
+        geolocation: [],
+      },
+    },
+  },
   site: {
     url: 'https://lostincyprus.netlify.app',
     name: 'Lost in Cyprus'
