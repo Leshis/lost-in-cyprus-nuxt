@@ -72,10 +72,10 @@
         <span v-if="requireImage" class="required-star">*</span>
       </label>
       <input id="article-image" type="file" accept="image/*" :required="requireImage"
-        @change="$emit('file-change', $event)" />
+        @change="onFileChange" />
     </div>
 
-    <div class="field" v-if="localForm.image_url || requireImage">
+    <div class="field" v-if="localForm.image_url || pendingFileSelected || requireImage">
   <label for="article-alt">Image Description (Alt Text) <span class="required-star">*</span></label>
   <input 
     id="article-alt" 
@@ -143,6 +143,14 @@ const localForm = computed({
   get: () => props.form,
   set: (val) => emit('update:form', val),
 })
+
+const onFileChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files.length > 0){
+    pendingFileSelected.value = true
+  }
+  emit('file-change', event)
+}
 
 </script>
 
