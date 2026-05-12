@@ -1,6 +1,6 @@
 [build]
-  command = "npm run generate"
-  publish = "dist"
+  command = "npm run build"
+  publish = ".output/public"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -15,7 +15,7 @@
     Content-Security-Policy = """
       default-src 'self';
       script-src 'self' https://challenges.cloudflare.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      style-src 'self' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: blob: https://*.supabase.co https://placehold.jp;
       connect-src 'self' https://*.supabase.co https://api.emailjs.com;

@@ -103,7 +103,7 @@ const loadData = async (slug: string) => {
 watch([currentSlug, isPreview], ([slug]) => loadData(slug), { immediate: true })
 
 const goBack = () => {
-  if (window.history.length > 2) {
+  if (import.meta.client && window.history.length > 2) {
     router.back()
   } else {
     router.push('/')

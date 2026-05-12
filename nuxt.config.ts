@@ -2,8 +2,9 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-05-06',
   devtools: { enabled: true },
-  ssr: false,
+  ssr: true,
   modules: [
+    '@netlify/nuxt',
     ['@nuxtjs/supabase', {
       types: null,
       redirect: false
