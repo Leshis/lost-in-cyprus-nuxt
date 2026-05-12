@@ -4,14 +4,13 @@
     <!-- Toolbar -->
     <div class="rte-toolbar">
       <template v-for="(btn, i) in toolbarButtons" :key="i">
-        <div v-if="btn.type === 'divider'" class="rte-divider" />
+        <div v-if="'type' in btn && btn.type === 'divider'" class="rte-divider" />
         <button
-          v-else
+          v-else-if="'cmd' in btn"
           type="button"
           :title="btn.title"
-          :class="['rte-btn', { active: btn.cmd ? activeStates[btn.cmd] : false }]"
-          :style="btn.style"
-          @mousedown.prevent="btn.cmd ? execCmd(btn.cmd, btn.value) : null"
+          :class="['rte-btn', btn.cls, { active: activeStates[btn.cmd] }]"
+          @mousedown.prevent="execCmd(btn.cmd, btn.value)"
         >
           {{ btn.label }}
         </button>
@@ -111,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
-import DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify'
 
 const props = defineProps<{
   modelValue: string
@@ -121,45 +120,65 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const toolbarButtons = [
-  { cmd: 'formatBlock', value: 'h2', label: 'H2', title: 'Heading 2' },
-  { cmd: 'formatBlock', value: 'h3', label: 'H3', title: 'Heading 3' },
-  { cmd: 'formatBlock', value: 'p',  label: '¶',  title: 'Paragraph' },
+// ── Toolbar types ─────────────────────────────────────────────────────────────
+
+type ToolbarDivider = { type: 'divider' }
+type ToolbarButton = {
+  cmd: string
+  value?: string
+  label: string
+  title: string
+  cls?: string
+}
+type ToolbarItem = ToolbarDivider | ToolbarButton
+
+const toolbarButtons: ToolbarItem[] = [
+  { cmd: 'formatBlock', value: 'h2', label: 'H2',  title: 'Heading 2' },
+  { cmd: 'formatBlock', value: 'h3', label: 'H3',  title: 'Heading 3' },
+  { cmd: 'formatBlock', value: 'p',  label: '¶',   title: 'Paragraph' },
   { type: 'divider' },
-  { cmd: 'bold',                label: 'B',  title: 'Bold',          style: { fontWeight: 700 } },
-  { cmd: 'italic',              label: 'I',  title: 'Italic',        style: { fontStyle: 'italic' } },
-  { cmd: 'underline',           label: 'U',  title: 'Underline',     style: { textDecoration: 'underline' } },
+  { cmd: 'bold',                label: 'B',  title: 'Bold',          cls: 'fmt-bold' },
+  { cmd: 'italic',              label: 'I',  title: 'Italic',        cls: 'fmt-italic' },
+  { cmd: 'underline',           label: 'U',  title: 'Underline',     cls: 'fmt-underline' },
   { cmd: 'strikeThrough',       label: 'S̶',  title: 'Strikethrough' },
   { type: 'divider' },
   { cmd: 'insertUnorderedList', label: '•≡', title: 'Bullet List' },
   { cmd: 'insertOrderedList',   label: '1≡', title: 'Numbered List' },
   { type: 'divider' },
   { cmd: 'justifyLeft',   label: '⬅', title: 'Align Left' },
-  { cmd: 'justifyCenter', label: '≡', title: 'Centre' },
+  { cmd: 'justifyCenter', label: '≡',  title: 'Centre' },
   { cmd: 'justifyRight',  label: '➡', title: 'Align Right' },
 ]
 
-const editorEl      = ref<HTMLDivElement | null>(null)
-const showHtml      = ref(false)
-const activeStates  = ref<Record<string, boolean>>({})
+// ── State ─────────────────────────────────────────────────────────────────────
+
+const editorEl       = ref<HTMLDivElement | null>(null)
+const showHtml       = ref(false)
+const activeStates   = ref<Record<string, boolean>>({})
 const showImageModal = ref(false)
 const imageUrlInput  = ref<HTMLInputElement | null>(null)
 const savedRange     = ref<Range | null>(null)
 const imageForm      = ref({ url: '', alt: '', align: 'left' as 'left' | 'center' | 'right' })
+
+// ── Computed ──────────────────────────────────────────────────────────────────
 
 const wordCount = computed(() => {
   const text = editorEl.value?.innerText || ''
   return text.trim().split(/\s+/).filter(Boolean).length
 })
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
 function sanitize(html: string) {
   return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
 }
 
 function updateStates() {
-  const cmds = ['bold','italic','underline','strikeThrough',
-                'insertUnorderedList','insertOrderedList',
-                'justifyLeft','justifyCenter','justifyRight']
+  const cmds = [
+    'bold', 'italic', 'underline', 'strikeThrough',
+    'insertUnorderedList', 'insertOrderedList',
+    'justifyLeft', 'justifyCenter', 'justifyRight',
+  ]
   const next: Record<string, boolean> = {}
   cmds.forEach(cmd => {
     try { next[cmd] = document.queryCommandState(cmd) } catch { /* noop */ }
@@ -205,20 +224,25 @@ function insertImage() {
   editorEl.value?.focus()
 
   const { url, alt, align } = imageForm.value
-  const alignStyle = align === 'center'
-    ? 'display:block;margin:1em auto;'
-    : align === 'right'
-    ? 'float:right;margin:0 0 1em 1.5em;'
-    : 'float:left;margin:0 1.5em 1em 0;'
+  const alignClass = align === 'center' ? 'img-center'
+    : align === 'right' ? 'img-right'
+    : 'img-left'
+
+  const img = document.createElement('img')
+  img.src = url
+  img.alt = alt
+  img.className = `rte-inserted-img ${alignClass}`
 
   document.execCommand(
     'insertHTML', false,
-    `<img src="${url}" alt="${alt}" style="max-width:100%;height:auto;border-radius:4px;${alignStyle}" /><span>\u200B</span>`
+    `${img.outerHTML}<span>\u200B</span>`
   )
 
   showImageModal.value = false
   emit('update:modelValue', sanitize(editorEl.value?.innerHTML ?? ''))
 }
+
+// ── Lifecycle ─────────────────────────────────────────────────────────────────
 
 onMounted(() => {
   if (editorEl.value && props.modelValue) {
@@ -235,6 +259,18 @@ watch(
   }
 )
 </script>
+
+<!-- Global styles: required for dynamically inserted images which don't receive Vue's scoped attribute -->
+<style>
+.rte-inserted-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.rte-inserted-img.img-left   { float: left;   margin: 0 1.5em 1em 0; }
+.rte-inserted-img.img-center { display: block; margin: 1em auto; }
+.rte-inserted-img.img-right  { float: right;  margin: 0 0 1em 1.5em; }
+</style>
 
 <style scoped>
 .rte-wrapper {
@@ -280,6 +316,11 @@ watch(
 }
 .rte-btn:hover  { background: #2e2e2a; color: #fff; }
 .rte-btn.active { background: #c8a96e; color: #1c1c1a; }
+
+/* Toolbar button label formatting — replaces inline styles */
+.fmt-bold      { font-weight: 700; }
+.fmt-italic    { font-style: italic; }
+.fmt-underline { text-decoration: underline; }
 
 .rte-toggle {
   background: #2a2a26;
