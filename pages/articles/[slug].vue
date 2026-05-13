@@ -49,17 +49,19 @@ const articleDescription = computed(() =>
 
 const { url } = useSiteConfig()
 const siteBaseUrl = computed(() => {
-  const raw = String(url ?? '').replace(/\/+$/, '')
-  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+  const raw = String(url ?? '').trim()
+  if (!raw) return ''
+  const withoutTrailingSlash = raw.replace(/\/+$/, '')
+  return /^https?:\/\//i.test(withoutTrailingSlash) ? withoutTrailingSlash : `https://${withoutTrailingSlash}`
 })
 
 useHead({
-  link: [
+  link: () => siteBaseUrl.value ? [
     {
       rel: 'canonical',
-      href: () => `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
+      href: `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
     },
-  ],
+  ] : [],
 })
 
 useSeoMeta({
@@ -73,7 +75,7 @@ useSeoMeta({
   ogTitle: () => article.value?.title ?? 'Lost in Cyprus',
   ogDescription: articleDescription,
   ogImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-  ogUrl: () => `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
+  ogUrl: () => siteBaseUrl.value ? `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}` : undefined,
 
   // Twitter / X
   twitterCard: 'summary_large_image',
