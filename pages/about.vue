@@ -10,31 +10,16 @@
       </p>
     </header>
 
-    <!-- Founders Section (Large Nature Silhouettes) -->
     <section class="founders-section">
       <h2 class="section-title">Our Founders</h2>
       <div class="founders-container">
-        <!-- Founder 1 -->
-        <div class="founder-card">
+         <div v-for="founder in founders" :key="founder.title" class="founder-card">
           <div class="silhouette-frame">
-            <!-- Replace with your actual silhouette photo -->
-            <img src="/founder_1.webp" alt="Founder silhouette in the mountains surrounded by snow" class="founder-img" />
+            <img :src="founder.src" :alt="founder.alt" class="founder-img" />
           </div>
           <div class="founder-info">
-            <h3>The Explorer</h3>
-            <p>On a mission to map every hidden trail and sunset peak.</p>
-          </div>
-        </div>
-
-        <!-- Founder 2 -->
-        <div class="founder-card">
-          <div class="silhouette-frame">
-            <!-- Replace with your actual silhouette photo -->
-            <img src="/founder_2.webp" alt="Founder silhouette by a coastal cliff with sea in background" class="founder-img" />
-          </div>
-          <div class="founder-info">
-            <h3>The Storyteller</h3>
-            <p>Capturing the traditions and secrets that define our culture.</p>
+            <h3>{{ founder.title }}</h3>
+            <p>{{ founder.bio }}</p>
           </div>
         </div>
       </div>
@@ -65,6 +50,23 @@
     </section>
   </div>
 </template>
+
+<script setup>
+const founders = [
+  {
+    title: 'The Explorer',
+    bio: 'On a mission to map every hidden trail and sunset peak.',
+    src: '/founder_1.webp',
+    alt: 'Founder silhouette in the mountains surrounded by snow',
+  },
+  {
+    title: 'The Storyteller',
+    bio: 'Capturing the traditions and secrets that define our culture.',
+    src: '/founder_2.webp',
+    alt: 'Founder silhouette by a coastal cliff with sea in background',
+  },
+]
+</script>
 
 <style scoped>
 /* Base Layout */
