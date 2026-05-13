@@ -154,13 +154,8 @@ const localForm = computed({
 
 const onFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement
-<<<<<<< dev
   pendingFileSelected.value = !!(target.files && target.files.length > 0)
-=======
-  if (target.files && target.files.length > 0){
-    pendingFileSelected.value = true
-  }
->>>>>>> main
+
   emit('file-change', event)
 }
 
