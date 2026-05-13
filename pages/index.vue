@@ -40,14 +40,15 @@
             class="filter-pill"
             :class="{ active: activeFilter === cat.id }"
             @click="activeFilter = cat.id"
+            :aria-pressed="activeFilter === cat.id"
           >
             {{ cat.label }}
           </button>
         </div>
 
-        <h3 class="results-header">
+        <h2 class="results-header">
           {{ filteredLocations.length }} Secrets in {{ activeDistrictName }}
-        </h3>
+        </h2>
 
         <div v-if="articleStore.loading" class="loading-state">
           <p>Loading Cyprus secrets…</p>
@@ -77,8 +78,7 @@
 
             <div class="card-content">
               <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
-              <h4>{{ loc.title }}</h4>
-              <p>Discover this hidden Cyprus secret.</p>
+              <h3>{{ loc.title }}</h3>
 
               <div class="card-footer">
                 <small>{{ loc.district }}</small>
@@ -400,7 +400,7 @@ const handleAction = (loc: Article): void => {
   border-radius: 6px;
   font-size: 0.8rem;
   cursor: pointer;
-  transition: background 0.2s color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .action-btn:hover {
