@@ -1,23 +1,17 @@
 <template>
   <div class="privacy-page">
-
     <header class="privacy-header">
       <div class="header-inner">
-        <span class="header-eyebrow">Legal</span>
         <h1 class="header-title">Privacy Policy</h1>
-        <p class="header-meta">Last updated: <time>{{ lastUpdated }}</time></p>
-      </div>
-      <div class="header-decoration" aria-hidden="true">
-        <span>🔒</span>
+        <p class="header-meta">Last updated: <time>13 May 2026</time></p>
       </div>
     </header>
 
     <div class="privacy-body">
       <article class="privacy-content">
-
         <section class="intro-block">
           <p>
-            This website ("Cyprus Secrets") is a guide to discovering hidden experiences in Cyprus. 
+            <b class="brand-greeting">Yia Sas!</b> Lost in Cyprus is a guide to discovering hidden experiences on the island we call home. 
             We value your privacy: we do not run advertising, sell your data, or create user profiles. 
             This policy outlines the limited instances where data is handled.
           </p>
@@ -74,91 +68,44 @@
             the contact form on our website.
           </p>
         </section>
-
       </article>
     </div>
-
   </div>
 </template>
 
-<script setup lang="ts">
-const lastUpdated = new Date().toLocaleDateString('en-GB', {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-})
-</script>
-
 <style scoped>
 .privacy-page {
-  background-color: var(--bg-warm);
-  color: var(--color-navy);
+  background-color: var(--bg-warm-light);
+  color: var(--text-primary);
   min-height: 100svh;
-}
-
-@media (min-width: 768px) {
-  .privacy-page {
-    padding-top: var(--navbar-height);
-  }
+  font-family: var(--font-main);
 }
 
 .privacy-header {
-  background-color: var(--color-navy);
-  padding: var(--space-5) var(--space-4) 56px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-
-.privacy-header::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 80% 50%, var(--color-gold-muted) 0%, transparent 60%),
-    radial-gradient(ellipse at 20% 80%, rgba(198, 159, 75, 0.06) 0%, transparent 50%);
-}
-
-.header-inner { position: relative; z-index: 1; }
-
-.header-eyebrow {
-  display: block;
-  font-size: var(--size-xs);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-gold);
-  margin-bottom: var(--space-2);
+  padding: var(--navbar-height) var(--space-4) var(--space-4);
+  max-width: var(--container-narrow);
+  margin: 0 auto;
 }
 
 .header-title {
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-family: var(--font-heading);
+  font-size: var(--size-2xl);
   font-weight: var(--weight-bold);
-  color: var(--text-white);
-  margin: 0 0 var(--space-3);
-  line-height: 1;
+  margin-bottom: var(--space-2);
+  color: var(--color-navy);
 }
 
 .header-meta {
   font-size: var(--size-sm);
-  color: rgba(255, 255, 255, 0.45);
-  margin: 0;
-}
-
-.header-decoration {
-  font-size: 5rem;
-  opacity: 0.08;
-  position: relative;
-  z-index: 1;
-  line-height: 1;
-  align-self: center;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .privacy-body {
   max-width: var(--container-narrow);
   margin: 0 auto;
-  padding: var(--space-5) var(--space-4) 80px;
+  padding: 0 var(--space-4) var(--space-5);
 }
 
 .privacy-content {
@@ -168,23 +115,21 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
 }
 
 .intro-block {
-  background: var(--color-navy);
-  color: rgba(255, 255, 255, 0.85);
-  border-radius: var(--radius);
-  padding: 28px 32px;
-  font-size: var(--size-base);
-  line-height: 1.7;
+  font-size: var(--size-lg);
+  line-height: 1.6;
+  color: var(--color-text-dark);
 }
 
-.policy-section {
-  padding-bottom: var(--space-5);
+.brand-greeting {
+  color: var(--color-copper);
 }
 
 .policy-section h2 {
+  font-family: var(--font-heading);
   font-size: var(--size-xl);
   font-weight: var(--weight-bold);
+  margin-bottom: var(--space-3);
   color: var(--color-navy);
-  margin: 0 0 var(--space-3);
 }
 
 .policy-section p {
@@ -196,27 +141,28 @@ const lastUpdated = new Date().toLocaleDateString('en-GB', {
 .service-list {
   list-style: none;
   padding: 0;
-  margin: var(--space-3) 0 0;
+  margin-top: var(--space-3);
 }
 
 .service-list li {
-  font-size: var(--size-sm);
-  color: var(--color-text-mid);
   padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--border-mid);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--color-text-mid);
+  font-size: var(--size-sm);
 }
 
-.service-list li:last-child { 
-  border-bottom: none; 
+.service-list li:last-child {
+  border-bottom: none;
 }
 
-.service-list strong { 
-  color: var(--color-navy); 
-  font-weight: var(--weight-bold); 
+.service-list strong {
+  color: var(--color-navy);
+  font-weight: var(--weight-bold);
 }
 
-@media (min-width: 900px) {
-  .privacy-header { padding: 80px 60px 64px; }
-  .privacy-body { padding: 60px 60px 100px; }
+@media (min-width: 768px) {  
+  .privacy-header {
+    padding-top: calc(var(--navbar-height) + var(--space-3));
+  }
 }
 </style>
