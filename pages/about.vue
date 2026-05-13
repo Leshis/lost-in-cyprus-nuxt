@@ -58,9 +58,9 @@
       </div>
       
       <div class="cta-wrapper">
-        <router-link to="/" class="explore-btn">
+        <NuxtLink to="/" class="explore-btn">
           EXPLORE THE SECRETS
-        </router-link>
+        </NuxtLink>
       </div>
     </section>
   </div>
