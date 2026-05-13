@@ -71,7 +71,6 @@
         Featured Image (Beaches, Tavernas, etc.)
         <span v-if="requireImage" class="required-star">*</span>
       </label>
-<<<<<<< dev
       <input id="article-image" type="file" accept="image/*" :required="requireImage" @change="onFileChange" />
     </div>
 
@@ -80,10 +79,6 @@
       <input id="article-alt" v-model="localForm.alt_text" type="text"
         placeholder="e.g. A clear view of Blue Lagoon with small boats" required />
       <p class="hint">Help Google "see" this photo for your SEO ranking.</p>
-=======
-      <input id="article-image" type="file" accept="image/*" :required="requireImage"
-        @change="onFileChange" />
->>>>>>> main
     </div>
 
     <div class="field" v-if="localForm.image_url || pendingFileSelected || requireImage">
