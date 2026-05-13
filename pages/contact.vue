@@ -129,13 +129,6 @@ const handleSubmit = async () => {
   max-width: 520px;
 }
 
-h1 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #1c2a32;
-  margin-bottom: 0.5rem;
-}
-
 .subtitle {
   color: #6b7280;
   margin-bottom: 2rem;
