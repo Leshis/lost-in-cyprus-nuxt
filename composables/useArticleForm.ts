@@ -182,7 +182,13 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const oldImagePath = editingId.value ? form.image_url : null
 
+<<<<<<< dev
             assertPublishAltText(publish)
+=======
+            if (publish && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+                throw new Error('Please provide an image description (Alt Text) before publishing.')
+            }
+>>>>>>> main
             
             let imagePath: string | undefined
             if (selectedFile.value) {
@@ -199,7 +205,11 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const articlePayload = {
                 title: form.title,
+<<<<<<< dev
                 alt_text: form.alt_text?.trim() || '',
+=======
+                alt_text: form.alt_text,
+>>>>>>> main
                 slug: form.slug,
                 district: form.district,
                 content: form.content.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '<h2>$1</h2>'),
