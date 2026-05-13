@@ -235,6 +235,7 @@ const handleLogout = async () => {
   background: white;
   border-radius: 12px;
   flex: 1; 
+  min-height: 0;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
   overflow-y: auto;
   position: relative; 
