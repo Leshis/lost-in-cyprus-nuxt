@@ -49,8 +49,8 @@
 
       <aside class="live-preview-section">
         <div class="preview-sticky-wrapper">
-          <div class="preview-badge">Live Preview</div>
           <div class="preview-window">
+            <div class="preview-badge">Live Preview</div>
             <ArticleContent :article="form" :isPreview="true" />
           </div>
         </div>
@@ -192,7 +192,7 @@ const handleLogout = async () => {
 .admin-editor-layout {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 30px;
 }
 
@@ -211,26 +211,33 @@ const handleLogout = async () => {
 .preview-sticky-wrapper {
   position: sticky;
   top: 20px;
+  height: calc(100vh - 40px); 
+  display: flex;
+  flex-direction: column;
 }
 
 .preview-badge {
-  background: #333;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background: rgba(51, 51, 51, 0.8); 
   color: white;
-  display: inline-block;
   padding: 4px 12px;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border-radius: 4px 4px 0 0;
+  border-radius: 4px; 
+  pointer-events: none; 
 }
 
 .preview-window {
   background: white;
   border-radius: 12px;
-  max-height: 90dvh;
+  flex: 1; 
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-  min-height: 600px;
   overflow-y: auto;
+  position: relative; 
 }
 
 .editing-banner {
