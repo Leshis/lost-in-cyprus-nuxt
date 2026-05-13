@@ -158,11 +158,7 @@ export default defineComponent({ name: 'ManageArticles' })
     justify-content: flex-end;
     width: auto;
   }
-}
 
-/* ─── Desktop: grid mimics a table ───────────────────────────────────────── */
-
-@media (min-width: 640px) {
   .article-list {
     gap: 0;
     border: 1px solid #edf2f7;
@@ -172,13 +168,18 @@ export default defineComponent({ name: 'ManageArticles' })
 
   .article-row {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr 120px 240px; 
     align-items: center;
     gap: 1rem;
     padding: 0.875rem 1rem;
-    border: none;
-    border-bottom: 1px solid #edf2f7;
-    border-radius: 0;
+  }
+
+  .article-row :deep(.status-badge) {
+    justify-self: center;
+  }
+
+  .col-actions {
+    justify-self: center;
   }
 
   .article-row:last-child {
@@ -194,6 +195,11 @@ export default defineComponent({ name: 'ManageArticles' })
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #718096;
+  }
+
+  .article-row--header span:nth-child(2),
+  .article-row--header span:nth-child(3) {
+    text-align: center;
   }
 
   .col-title {
