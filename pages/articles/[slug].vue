@@ -47,12 +47,26 @@ const articleDescription = computed(() =>
     : 'Discover hidden gems and local secrets across Cyprus.'
 )
 
+const { url } = useSiteConfig()
 const siteBaseUrl = computed(() => {
-  const raw = String(useSiteConfig().url ?? '').replace(/\/+$/, '')
-  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
+  const raw = String(url ?? '').trim()
+  if (!raw) return ''
+  const withoutTrailingSlash = raw.replace(/\/+$/, '')
+  return /^https?:\/\//i.test(withoutTrailingSlash) ? withoutTrailingSlash : `https://${withoutTrailingSlash}`
+})
+
+useHead({
+  link: () => siteBaseUrl.value ? [
+    {
+      rel: 'canonical',
+      href: `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
+    },
+  ] : [],
 })
 
 useSeoMeta({
+  robots: () => isPreview.value ? 'noindex, nofollow' : undefined,
+  articlePublishedTime: () => article.value?.created_at,
   title: () => article.value?.title ? `Lost in Cyprus – ${article.value.title}` : 'Lost in Cyprus',
   description: articleDescription,
 
@@ -61,7 +75,7 @@ useSeoMeta({
   ogTitle: () => article.value?.title ?? 'Lost in Cyprus',
   ogDescription: articleDescription,
   ogImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
-  ogUrl: () => `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
+  ogUrl: () => siteBaseUrl.value ? `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}` : undefined,
 
   // Twitter / X
   twitterCard: 'summary_large_image',
@@ -75,16 +89,17 @@ useSchemaOrg(() => {
 
   return [
     defineArticle({
+      author: { name: 'Lost in Cyprus' },
       headline: article.value.title,
       description: articleDescription.value,
       image: article.value.image_url ? getImageUrl(article.value.image_url) : undefined,
-      datePublished: article.value.created_at,
-      dateModified: article.value.created_at,
+      datePublished: article.value.created_at
     })
   ]
 })
 
 const loadData = async (slug: string) => {
+  articleStore.clearError()
   if (!slug || slug === 'undefined') return
   const cached = isPreview.value
     ? articleStore.getArticleBySlug(slug)

@@ -15,7 +15,7 @@
         </div>
 
         <div class="menu-body">
-          <router-link to="/about" class="menu-item" @click="emit('close')">ABOUT ME</router-link>
+          <router-link to="/about" class="menu-item" @click="emit('close')">ABOUT US</router-link>
           <router-link to="/contact" class="menu-item" @click="emit('close')">CONTACT</router-link>
           <router-link to="/privacy-policy" class="menu-item" @click="emit('close')">PRIVACY POLICY</router-link>
           <SearchBar />

@@ -71,8 +71,19 @@
         Featured Image (Beaches, Tavernas, etc.)
         <span v-if="requireImage" class="required-star">*</span>
       </label>
+<<<<<<< dev
+      <input id="article-image" type="file" accept="image/*" :required="requireImage" @change="onFileChange" />
+    </div>
+
+    <div class="field" v-if="localForm.image_url || pendingFileSelected || requireImage">
+      <label for="article-alt">Image Description (Alt Text) <span class="required-star">*</span></label>
+      <input id="article-alt" v-model="localForm.alt_text" type="text"
+        placeholder="e.g. A clear view of Blue Lagoon with small boats" required />
+      <p class="hint">Help Google "see" this photo for your SEO ranking.</p>
+=======
       <input id="article-image" type="file" accept="image/*" :required="requireImage"
         @change="onFileChange" />
+>>>>>>> main
     </div>
 
     <div class="field" v-if="localForm.image_url || pendingFileSelected || requireImage">
@@ -88,12 +99,7 @@
 </div>
 
     <div class="actions">
-      <button
-        type="button"
-        @click="$emit('save-draft')"
-        :disabled="uploading"
-        class="btn-ghost"
-      >
+      <button type="button" @click="$emit('save-draft')" :disabled="uploading" class="btn-ghost">
         Save as Draft
       </button>
       <button type="submit" :disabled="uploading" class="btn-primary">
@@ -148,9 +154,8 @@ const localForm = computed({
 
 const onFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement
-  if (target.files && target.files.length > 0){
-    pendingFileSelected.value = true
-  }
+  pendingFileSelected.value = !!(target.files && target.files.length > 0)
+
   emit('file-change', event)
 }
 
@@ -158,7 +163,8 @@ const onFileChange = (event: Event) => {
 
 <style scoped>
 .article-form {
-  display: flex; /* Ensure form fields also stack correctly */
+  display: flex;
+  /* Ensure form fields also stack correctly */
   flex-direction: column;
   gap: 1.5rem;
 }
@@ -171,11 +177,13 @@ const onFileChange = (event: Event) => {
 /* Mobile View (typically under 600px or 768px) */
 @media (max-width: 600px) {
   .actions {
-    flex-direction: column; /* Stacks the buttons vertically */
+    flex-direction: column;
+    /* Stacks the buttons vertically */
   }
 
   .actions button {
-    width: 100%; /* Makes buttons equal width to the form container */
+    width: 100%;
+    /* Makes buttons equal width to the form container */
     margin-right: 0;
   }
 }

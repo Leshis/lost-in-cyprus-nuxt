@@ -127,14 +127,18 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         }
     }
 
+    const assertPublishAltText = (shouldPublish: boolean) => {
+        if (shouldPublish && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
+            throw new Error('Please provide an image description (Alt Text) before publishing.')
+        }    
+    }
+
     const handleTogglePublish = async (): Promise<void> => {
         if (!editingId.value) return
         const newPublishState = !form.is_published
 
         try {
-            if (newPublishState && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
-                throw new Error('Please provide an image description (Alt Text) before publishing.')
-            }
+            assertPublishAltText(newPublishState)
 
             uploading.value = true
             statusMsg.value = newPublishState ? 'Publishing...' : 'Unpublishing...'
@@ -178,9 +182,8 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const oldImagePath = editingId.value ? form.image_url : null
 
-            if (publish && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
-                throw new Error('Please provide an image description (Alt Text) before publishing.')
-            }
+            assertPublishAltText(publish)
+
             
             let imagePath: string | undefined
             if (selectedFile.value) {
@@ -197,7 +200,8 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             const articlePayload = {
                 title: form.title,
-                alt_text: form.alt_text,
+                alt_text: form.alt_text?.trim() || '',
+
                 slug: form.slug,
                 district: form.district,
                 content: form.content.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '<h2>$1</h2>'),
