@@ -20,7 +20,6 @@ export default defineNuxtConfig({
       contentSecurityPolicy: {
         'default-src': ["'self'"],
         'script-src': ["'self'", "'nonce-{{nonce}}'", "https://challenges.cloudflare.com"],
-        'style-src': ["'self'", "'nonce-{{nonce}}'", "https://fonts.googleapis.com"],
         'font-src': ["'self'", "https://fonts.gstatic.com"],
         'img-src': ["'self'", "data:", "blob:", "https://*.supabase.co", "https://placehold.jp"],
         'connect-src': ["'self'", "https://*.supabase.co", "https://api.emailjs.com"],
@@ -108,8 +107,6 @@ export default defineNuxtConfig({
         { name: 'twitter:description', content: 'Discover hidden gems and authentic experiences in Cyprus' }
       ],
       link: [
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         { rel: 'icon', href: '/lost-in-cyprus.webp' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }, // Fixes "apple-touch-icon" error
         { rel: 'canonical', href: 'https://lostincyprus.netlify.app' }
