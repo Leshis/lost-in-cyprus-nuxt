@@ -110,10 +110,6 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap',
-        },
         { rel: 'icon', href: '/lost-in-cyprus.webp' },
         { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }, // Fixes "apple-touch-icon" error
         { rel: 'canonical', href: 'https://lostincyprus.netlify.app' }
