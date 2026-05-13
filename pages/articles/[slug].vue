@@ -47,12 +47,24 @@ const articleDescription = computed(() =>
     : 'Discover hidden gems and local secrets across Cyprus.'
 )
 
+const { url } = useSiteConfig()
 const siteBaseUrl = computed(() => {
-  const raw = String(useSiteConfig().url ?? '').replace(/\/+$/, '')
+  const raw = String(url ?? '').replace(/\/+$/, '')
   return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`
 })
 
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: () => `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}`,
+    },
+  ],
+})
+
 useSeoMeta({
+  robots: () => isPreview.value ? 'noindex, nofollow' : undefined,
+  articlePublishedTime: () => article.value?.created_at,
   title: () => article.value?.title ? `Lost in Cyprus – ${article.value.title}` : 'Lost in Cyprus',
   description: articleDescription,
 
@@ -75,16 +87,17 @@ useSchemaOrg(() => {
 
   return [
     defineArticle({
+      author: { name: 'Lost in Cyprus' },
       headline: article.value.title,
       description: articleDescription.value,
       image: article.value.image_url ? getImageUrl(article.value.image_url) : undefined,
-      datePublished: article.value.created_at,
-      dateModified: article.value.created_at,
+      datePublished: article.value.created_at
     })
   ]
 })
 
 const loadData = async (slug: string) => {
+  articleStore.clearError()
   if (!slug || slug === 'undefined') return
   const cached = isPreview.value
     ? articleStore.getArticleBySlug(slug)
