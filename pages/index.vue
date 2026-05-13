@@ -374,7 +374,7 @@ const handleAction = (loc: Article): void => {
   letter-spacing: 0.5px;
 }
 
-.card-content h4 { margin: 4px 0; color: #1a1a1a; }
+.card-content h3 { margin: 4px 0; color: #1a1a1a; }
 
 .card-content p {
   font-size: 0.9rem;
