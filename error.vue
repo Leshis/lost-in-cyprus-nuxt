@@ -5,10 +5,10 @@
         <span class="compass-icon">🧭</span>
       </div>
 
-      <h1 class="error-code">404</h1>
-      <h2 class="error-title">Lost in Cyprus</h2>
+      <h1 class="error-code">{{ error?.statusCode || error?.status || 'Error' }}</h1>
+      <h2 class="error-title">{{ errorTitle }}</h2>
       <p class="error-message">
-        Even the best explorers lose their way sometimes. This secret doesn't exist — or hasn't been uncovered yet.
+        {{ errorMessage }}
       </p>
 
       <div class="error-actions">
@@ -25,6 +25,31 @@
 
 <script setup lang="ts">
 import { clearError } from '#app'
+import { computed } from 'vue'
+
+const props = defineProps<{
+  error?: {
+    statusCode?: number
+    status?: number
+    message?: string
+  }
+}>()
+
+const errorTitle = computed(() => {
+  const statusCode = props.error?.statusCode || props.error?.status
+  if (statusCode === 404) {
+    return 'Lost in Cyprus'
+  }
+  return 'Something Went Wrong'
+})
+
+const errorMessage = computed(() => {
+  const statusCode = props.error?.statusCode || props.error?.status
+  if (statusCode === 404) {
+    return "Even the best explorers lose their way sometimes. This secret doesn't exist — or hasn't been uncovered yet."
+  }
+  return 'An unexpected error occurred. Please try again later.'
+})
 
 const handleError = () => clearError({ redirect: '/' })
 </script>
