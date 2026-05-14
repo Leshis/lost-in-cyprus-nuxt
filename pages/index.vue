@@ -1,37 +1,46 @@
 <template>
   <div class="page">
-    <section class="hero" v-once>
+
+    <!-- ─── Hero Video Section ──────────────────────────────────────────── -->
+    <section class="hero">
       <div class="hero-fallback" />
-      <video
-        ref="videoEl"
-        class="hero-video"
-        autoplay muted loop playsinline
-        preload="none"
-        poster=""
-      />
+
+      <ClientOnly>
+        <video
+          ref="videoEl"
+          class="hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster=""
+        >
+          <!-- <source src="https://YOUR_PROJECT.supabase.co/storage/v1/object/public/videos/hero.mp4" type="video/mp4" /> -->
+        </video>
+      </ClientOnly>
+
       <div class="hero-overlay">
         <h1 class="hero-title">Lost In Cyprus</h1>
         <p class="hero-subtitle">Hidden secrets, untold stories</p>
       </div>
     </section>
+
+    <!-- ─── Map + Content ────────────────────────────────────────────────── -->
     <div class="app-container">
       <aside class="map-section">
-        <Suspense>
-          <CyprusMap />
-          <template #fallback>
-            <div class="map-skeleton" aria-hidden="true" />
-          </template>
-        </Suspense>
+        <!-- No longer async — renders server-side with the page -->
+        <CyprusMap />
       </aside>
 
       <main class="content-section">
-        <div class="filter-row" role="group" aria-label="Category filter">
+        <div class="filter-row">
           <button
             v-for="cat in dynamicCategories"
             :key="cat.id"
             class="filter-pill"
             :class="{ active: activeFilter === cat.id }"
-            @click="setFilter(cat.id)"
+            @click="activeFilter = cat.id"
             :aria-pressed="activeFilter === cat.id"
           >
             {{ cat.label }}
@@ -42,9 +51,8 @@
           {{ filteredLocations.length }} Secrets in {{ activeDistrictName }}
         </h2>
 
-        <div v-if="fetchError || articleStore.error" class="error-state">
-          <p>Failed to load secrets. Please try again later.</p>
-          <button @click="resetFilters">Reset filters</button>
+        <div v-if="pending" class="loading-state">
+          <p>Loading Cyprus secrets…</p>
         </div>
 
         <div v-else-if="filteredLocations.length === 0" class="empty-state">
@@ -56,7 +64,6 @@
           <div
             v-for="(loc, index) in filteredLocations"
             :key="loc.id"
-            v-memo="[loc.id, loc.title, loc.image_url, loc._categoryLabel, loc.district, loc.affiliate_url, loc.slug, activeFilter, mapStore.selectedDistrict]"
             class="location-card"
           >
             <img
@@ -64,16 +71,14 @@
               :srcset="getImageSrcset(loc.image_url ?? '')"
               :loading="index === 0 ? 'eager' : 'lazy'"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-              :alt="loc.title"
+              :alt="loc.alt_text || loc.title"
               width="400"
               height="160"
               class="card-img"
-              :fetchpriority="index === 0 ? 'high' : 'auto'"
-              decoding="async"
             />
 
             <div class="card-content">
-              <span class="category-tag">{{ loc._categoryLabel }}</span>
+              <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
               <h3>{{ loc.title }}</h3>
 
               <div class="card-footer">
@@ -92,132 +97,108 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref, computed, shallowRef, markRaw,
-  onMounted, defineAsyncComponent
-} from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMapStore } from '@/stores/mapStore'
-import { useArticleStore } from '@/stores/articleStore'
 import { getImageUrl, getImageSrcset } from '@/utils/supabaseHelpers'
+import CyprusMap from '@/components/CyprusMap.vue'
 import type { Article } from '~/types/database.types'
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Category { id: string; label: string }
-type ArticleWithLabel = Article & { _categoryLabel: string }
-
-// ─── Static data ─────────────────────────────────────────────────────────────
-
-const CATEGORY_EMOJIS: Readonly<Record<string, string>> = Object.freeze({
-  beaches: '🏖️', hiking: '🥾', wine: '🍷', culture: '🏛️',
-  archaeology: '🏺', gastronomy: '🍲', religious: '⛪', rural: '🏡',
-  diving: '🤿', nightlife: '🪩', nature: '🌿', family: '🎡',
-  wellness: '🧘‍♀️', hidden_gems: '💎',
-})
-
-const formatCategoryLabel = (cat: string): string => {
-  const emoji = CATEGORY_EMOJIS[cat.toLowerCase()] ?? '📍'
-  const text = cat.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-  return `${emoji} ${text}`
+interface Category {
+  id: string
+  label: string
 }
 
-// ─── Async component ──────────────────────────────────────────────────────────
+const CATEGORY_EMOJIS: Record<string, string> = {
+  beaches: '🏖️',
+  hiking: '🥾',
+  wine: '🍷',
+  culture: '🏛️',
+  archaeology: '🏺',
+  gastronomy: '🍲',
+  religious: '⛪',
+  rural: '🏡',
+  diving: '🤿',
+  nightlife: '🪩',
+  nature: '🌿',
+  family: '🎡',
+  wellness: '🧘‍♀️',
+  hidden_gems: '💎',
+}
 
-const CyprusMap = markRaw(
-  defineAsyncComponent(() => import('@/components/CyprusMap.vue'))
-)
-
-// ─── Stores & router ─────────────────────────────────────────────────────────
+// types/database.types.ts or inline in the server route
+type ArticleCard = Pick<Article,
+  'id' | 'title' | 'slug' | 'category' | 'district' |
+  'image_url' | 'alt_text' | 'affiliate_url'
+>
 
 const mapStore = useMapStore()
-const articleStore = useArticleStore()
-const router = markRaw(useRouter())
-
-// ─── Data Fetching (SSR Strategy) ───────────────────────────────────────────
-
-// This fetches the data on the server, ensuring the cards are in the
-// initial HTML for that "instant" feel.
-const { error: fetchError } = await useAsyncData('init-articles', () => articleStore.fetchArticles())
-
-// ─── Local state ─────────────────────────────────────────────────────────────
-
+const router = useRouter()
 const activeFilter = ref<string>('all')
-const videoEl = shallowRef<HTMLVideoElement | null>(null)
+const videoEl = ref<HTMLVideoElement | null>(null)
 
-// ─── Computed ─────────────────────────────────────────────────────────────────
+// ── Fetch articles server-side ─────────────────────────────────────────────
+// useFetch runs on the server during SSR, embeds data in the HTML response,
+// then reuses it on the client without a second network call.
+const { data: articles, pending } = await useFetch<ArticleCard[]>('/api/articles')
 
-const annotatedArticles = computed<ArticleWithLabel[]>(() =>
-  articleStore.publishedArticles.map(a => ({
-    ...a,
-    _categoryLabel: a.category
-      ? a.category.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-      : '',
-  }))
-)
+const publishedArticles = computed(() => articles.value ?? [])
+
+// ── Categories ─────────────────────────────────────────────────────────────
+const formatCategoryLabel = (cat: string): string => {
+  const emoji = CATEGORY_EMOJIS[cat.toLowerCase()] ?? '📍'
+  const formattedText = cat
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+  return `${emoji} ${formattedText}`
+}
 
 const dynamicCategories = computed<Category[]>(() => {
-  const seen = new Set<string>()
-  const cats: Category[] = [{ id: 'all', label: 'All' }]
-  for (const a of annotatedArticles.value) {
-    if (a.category && !seen.has(a.category)) {
-      seen.add(a.category)
-      cats.push({ id: a.category, label: formatCategoryLabel(a.category) })
-    }
-  }
-  return cats
+  const unique = [...new Set(
+    publishedArticles.value.map(i => i.category).filter(Boolean)
+  )]
+  return [
+    { id: 'all', label: 'All' },
+    ...unique.map(cat => ({ id: cat, label: formatCategoryLabel(cat) })),
+  ]
 })
 
-const activeDistrictName = computed<string>(() => {
-  const d = mapStore.selectedDistrict
-  return d ? d.charAt(0).toUpperCase() + d.slice(1) : 'Cyprus'
-})
+// ── Filtering ──────────────────────────────────────────────────────────────
+const activeDistrictName = computed<string>(() =>
+  mapStore.selectedDistrict
+    ? mapStore.selectedDistrict.charAt(0).toUpperCase() + mapStore.selectedDistrict.slice(1)
+    : 'Cyprus'
+)
 
-const filteredLocations = computed<ArticleWithLabel[]>(() => {
-  const district = mapStore.selectedDistrict
-  const filter = activeFilter.value
-  if (!district && filter === 'all') return annotatedArticles.value
-  return annotatedArticles.value.filter(loc =>
-    (!district || loc.district === district) &&
-    (filter === 'all' || loc.category === filter)
-  )
-})
-
-// ─── Methods ──────────────────────────────────────────────────────────────────
-
-const setFilter = (id: string): void => { activeFilter.value = id }
+const filteredLocations = computed<ArticleCard[]>(() =>
+  publishedArticles.value.filter(loc => {
+    const matchDistrict = !mapStore.selectedDistrict || loc.district === mapStore.selectedDistrict
+    const matchCategory = activeFilter.value === 'all' || loc.category === activeFilter.value
+    return matchDistrict && matchCategory
+  })
+)
 
 const resetFilters = (): void => {
   activeFilter.value = 'all'
   mapStore.setSelectedDistrict(null)
 }
 
-const handleAction = (loc: Article): void => {
+const handleAction = (loc: ArticleCard): void => {
   loc.affiliate_url
     ? window.open(loc.affiliate_url, '_blank', 'noopener,noreferrer')
     : router.push(`/articles/${loc.slug}`)
 }
-
-// ─── Lifecycle ────────────────────────────────────────────────────────────────
-
-onMounted(() => {
-  const nav = navigator as Navigator & {
-    connection?: { saveData?: boolean; effectiveType?: string }
-  }
-  const conn = nav.connection
-  const savingData = conn?.saveData || conn?.effectiveType === '2g'
-  if (!savingData && videoEl.value) {
-    // videoEl.value.src = '...'
-    // videoEl.value.load()
-  }
-})
 </script>
 
 <style scoped>
 @media (min-width: 770px) {
-  .page { padding-top: var(--navbar-height); }
+  .page {
+    padding-top: var(--navbar-height);
+  }
 }
 
+/* ─── Hero ──────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
   height: 45svh;
@@ -238,8 +219,6 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  will-change: transform;
-  transform: translateZ(0); /* */
 }
 
 .hero-overlay {
@@ -271,6 +250,7 @@ onMounted(() => {
   font-size: 0.85rem;
 }
 
+/* ─── App container ─────────────────────────────────────────────────────── */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -285,32 +265,26 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  contain: strict; /* */
-}
-
-.map-skeleton {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #e8e4dc 25%, #f0ece4 50%, #e8e4dc 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite;
 }
 
 .content-section {
   flex: 1;
   background-color: #f8f6f0;
+  overflow-y: auto;
   padding: 20px 16px;
   border-radius: 20px 20px 0 0;
   margin-top: -20px;
   box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.08);
 }
 
+/* ─── Filter pills ──────────────────────────────────────────────────────── */
 .filter-row {
   display: flex;
   gap: 8px;
   margin: 0 -16px 16px;
   padding: 0 16px 12px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 
@@ -325,8 +299,10 @@ onMounted(() => {
   white-space: nowrap;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
+
+.filter-pill:hover { background: rgba(0, 0, 0, 0.06); }
 
 .filter-pill.active {
   background: #c69f4b;
@@ -334,6 +310,33 @@ onMounted(() => {
   border-color: #c69f4b;
 }
 
+/* ─── Results header ────────────────────────────────────────────────────── */
+.results-header {
+  margin: 0 0 16px;
+  font-size: 1rem;
+  color: #1a1a1a;
+}
+
+/* ─── States ────────────────────────────────────────────────────────────── */
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.empty-state button {
+  margin-top: 12px;
+  background: #1c2a32;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ─── Cards ─────────────────────────────────────────────────────────────── */
 .card-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -345,10 +348,7 @@ onMounted(() => {
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  contain: layout style; /* */
-  content-visibility: auto; /* */
-  contain-intrinsic-size: 0 260px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .card-img {
@@ -356,8 +356,10 @@ onMounted(() => {
   height: 160px;
   object-fit: cover;
   background-color: #eee;
-  display: block;
+  transition: transform 0.4s ease;
 }
+
+.location-card:hover .card-img { transform: scale(1.05); }
 
 .card-content { padding: 16px; }
 
@@ -366,6 +368,15 @@ onMounted(() => {
   text-transform: uppercase;
   color: #c69f4b;
   font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.card-content h3 { margin: 4px 0; color: #1a1a1a; }
+
+.card-content p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 12px;
 }
 
 .card-footer {
@@ -374,8 +385,9 @@ onMounted(() => {
   align-items: center;
   border-top: 1px solid #eee;
   padding-top: 12px;
-  margin-top: 12px;
 }
+
+.card-footer small { text-transform: capitalize; color: #999; }
 
 .action-btn {
   background: #1c2a32;
@@ -385,35 +397,46 @@ onMounted(() => {
   border-radius: 6px;
   font-size: 0.8rem;
   cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+.action-btn:hover { background: rgba(0, 0, 0, 0.56); }
 
-@media (prefers-reduced-motion: reduce) {
-  .map-skeleton {
-    animation: none;
-    background: #e8e4dc;
-  }
-}
-
+/* ─── Desktop ───────────────────────────────────────────────────────────── */
 @media (min-width: 1024px) {
   .hero { height: 50svh; }
+
   .app-container {
     flex-direction: row;
     height: 50dvh;
     overflow: hidden;
   }
-  .map-section { flex: 0 0 50%; height: 100%; }
+
+  .map-section {
+    flex: 0 0 50%;
+    height: 100%;
+    min-height: unset;
+  }
+
   .content-section {
     flex: 0 0 50%;
     height: 100%;
     border-radius: 0;
     margin-top: 0;
+    padding: 30px;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
     overflow-y: auto;
   }
-  .card-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+  .filter-row {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
 }
 </style>
