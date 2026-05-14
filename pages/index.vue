@@ -115,7 +115,6 @@ type ArticleCard = Pick<Article,
 >
 
 const mapStore = useMapStore()
-const router = useRouter()
 const activeFilter = ref<string>('all')
 const videoEl = ref<HTMLVideoElement | null>(null)
 
