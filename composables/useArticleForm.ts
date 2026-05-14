@@ -28,7 +28,7 @@ async function resizeBitmap(bitmap: ImageBitmap, maxWidth: number): Promise<Blob
     canvas.width = width
     canvas.height = height
     canvas.getContext('2d')!.drawImage(bitmap, 0, 0, width, height)
-    return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', 0.85))
+    return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', 0.93))
 }
 
 // Derive the thumb filename from the main filename
@@ -107,7 +107,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
     }
 
     const MAX_FILE_SIZE_MB = 10
-    const FULL_WIDTH = 800    // main image max width
+    const FULL_WIDTH = 1200    // main image max width
     const THUMB_WIDTH = 400   // thumbnail max width
 
     const handleFileChange = async (event: Event) => {
@@ -280,6 +280,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
                 // Clean up old images (main + thumb) only after successful DB update
                 if (oldImagePath && imagePath) {
+                    console.log("delete old images:", oldImagePath, toThumbPath(oldImagePath))
                     const pathsToRemove = [oldImagePath, toThumbPath(oldImagePath)]
                     supabase.storage
                         .from('articles')
