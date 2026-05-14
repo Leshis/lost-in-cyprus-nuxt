@@ -42,7 +42,12 @@
           {{ filteredLocations.length }} Secrets in {{ activeDistrictName }}
         </h2>
 
-        <div v-if="filteredLocations.length === 0" class="empty-state">
+        <div v-if="fetchError || articleStore.error" class="error-state">
+          <p>Failed to load secrets. Please try again later.</p>
+          <button @click="resetFilters">Reset filters</button>
+        </div>
+
+        <div v-else-if="filteredLocations.length === 0" class="empty-state">
           <p>No secrets found here yet. Try a different category!</p>
           <button @click="resetFilters">Reset filters</button>
         </div>
@@ -51,7 +56,7 @@
           <div
             v-for="(loc, index) in filteredLocations"
             :key="loc.id"
-            v-memo="[loc.id, activeFilter, mapStore.selectedDistrict]"
+            v-memo="[loc.id, loc.title, loc.image_url, loc._categoryLabel, loc.district, loc.affiliate_url, loc.slug, activeFilter, mapStore.selectedDistrict]"
             class="location-card"
           >
             <img
@@ -131,9 +136,9 @@ const router = markRaw(useRouter())
 
 // ─── Data Fetching (SSR Strategy) ───────────────────────────────────────────
 
-// This fetches the data on the server, ensuring the cards are in the 
+// This fetches the data on the server, ensuring the cards are in the
 // initial HTML for that "instant" feel.
-await useAsyncData('init-articles', () => articleStore.fetchArticles())
+const { error: fetchError } = await useAsyncData('init-articles', () => articleStore.fetchArticles())
 
 // ─── Local state ─────────────────────────────────────────────────────────────
 
@@ -385,6 +390,13 @@ onMounted(() => {
 @keyframes shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-skeleton {
+    animation: none;
+    background: #e8e4dc;
+  }
 }
 
 @media (min-width: 1024px) {
