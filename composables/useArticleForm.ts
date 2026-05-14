@@ -19,6 +19,24 @@ const EMPTY_FORM: ArticleFormFields = {
     image_url: null
 }
 
+// Resize a bitmap to a target max width, returns a WebP Blob
+async function resizeBitmap(bitmap: ImageBitmap, maxWidth: number): Promise<Blob | null> {
+    const scale = Math.min(1, maxWidth / bitmap.width)
+    const width = Math.round(bitmap.width * scale)
+    const height = Math.round(bitmap.height * scale)
+    const canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
+    canvas.getContext('2d')!.drawImage(bitmap, 0, 0, width, height)
+    return new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', 0.85))
+}
+
+// Derive the thumb filename from the main filename
+// e.g. "abc123.webp" -> "abc123_thumb.webp"
+export function toThumbPath(imagePath: string): string {
+    return imagePath.replace(/(\.[^.]+)$/, '_thumb$1')
+}
+
 export function useArticleForm(onSuccess: () => Promise<void>) {
     const supabase = useSupabaseClient()
     const form = reactive<ArticleFormFields>({ ...EMPTY_FORM })
@@ -26,6 +44,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
     const statusMsg = ref('')
     const isError = ref(false)
     const selectedFile = ref<File | null>(null)
+    const selectedThumbFile = ref<File | null>(null)   // NEW: 400px thumbnail
     const editingId = ref<number | null>(null)
     const isSlugCustom = ref(false)
     const resetTimerId = ref<ReturnType<typeof setTimeout> | null>(null)
@@ -36,6 +55,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
         if (statusTimerId.value) clearTimeout(statusTimerId.value)
         editingId.value = null
         selectedFile.value = null
+        selectedThumbFile.value = null
         isSlugCustom.value = false
         Object.assign(form, EMPTY_FORM)
         if (statusMsg) statusMsg.value = ''
@@ -87,7 +107,8 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
     }
 
     const MAX_FILE_SIZE_MB = 10
-    const MAX_DIMENSION = 1200
+    const FULL_WIDTH = 800    // main image max width
+    const THUMB_WIDTH = 400   // thumbnail max width
 
     const handleFileChange = async (event: Event) => {
         const target = event.target as HTMLInputElement
@@ -96,41 +117,53 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
             selectedFile.value = null
+            selectedThumbFile.value = null
             statusMsg.value = `Image must be under ${MAX_FILE_SIZE_MB}MB.`
             isError.value = true
             target.value = ''
             return
         }
 
-        const bitmap = await createImageBitmap(file)
+        // Clear stale values
+        selectedFile.value = null
+        selectedThumbFile.value = null
 
-        const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height))
-        const width = Math.round(bitmap.width * scale)
-        const height = Math.round(bitmap.height * scale)
+        const baseName = file.name.replace(/\.[^.]+$/, '')
+        let bitmap: ImageBitmap | null = null
 
-        const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        canvas.getContext('2d')!.drawImage(bitmap, 0, 0, width, height)
-        bitmap.close()
+        try {
+            bitmap = await createImageBitmap(file)
 
-        const webpBlob = await new Promise<Blob | null>(resolve =>
-            canvas.toBlob(resolve, 'image/webp', 0.85)
-        )
+            // Create full (800px) and thumb (400px) in parallel
+            const [fullBlob, thumbBlob] = await Promise.all([
+                resizeBitmap(bitmap, FULL_WIDTH),
+                resizeBitmap(bitmap, THUMB_WIDTH),
+            ])
 
-        if (webpBlob) {
-            selectedFile.value = new File(
-                [webpBlob],
-                file.name.replace(/\.[^.]+$/, '.webp'),
-                { type: 'image/webp' }
-            )
+            // Only assign if BOTH blobs are non-null
+            if (fullBlob && thumbBlob) {
+                selectedFile.value = new File([fullBlob], `${baseName}.webp`, { type: 'image/webp' })
+                selectedThumbFile.value = new File([thumbBlob], `${baseName}_thumb.webp`, { type: 'image/webp' })
+            }
+        } catch (err) {
+            // Ensure both remain null on error
+            selectedFile.value = null
+            selectedThumbFile.value = null
+            statusMsg.value = 'Failed to process image.'
+            isError.value = true
+            target.value = ''
+            throw err
+        } finally {
+            if (bitmap) {
+                bitmap.close()
+            }
         }
     }
 
     const assertPublishAltText = (shouldPublish: boolean) => {
         if (shouldPublish && (selectedFile.value || form.image_url) && !form.alt_text?.trim()) {
             throw new Error('Please provide an image description (Alt Text) before publishing.')
-        }    
+        }
     }
 
     const handleTogglePublish = async (): Promise<void> => {
@@ -184,24 +217,33 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
             assertPublishAltText(publish)
 
-            
             let imagePath: string | undefined
+            let mainFileName: string | undefined
+            let thumbFileName: string | undefined
+
             if (selectedFile.value) {
-                const ext = selectedFile.value.name.split('.').pop()
-                const fileName = `${crypto.randomUUID()}.${ext}`
+                const uuid = crypto.randomUUID()
+                mainFileName = `${uuid}.webp`
+                thumbFileName = `${uuid}_thumb.webp`
 
-                const { error: uploadError } = await supabase.storage
-                    .from('articles')
-                    .upload(fileName, selectedFile.value)
+                // Upload full and thumb in parallel
+                const uploads = [
+                    supabase.storage.from('articles').upload(mainFileName, selectedFile.value),
+                    ...(selectedThumbFile.value
+                        ? [supabase.storage.from('articles').upload(thumbFileName, selectedThumbFile.value)]
+                        : [])
+                ]
 
+                const results = await Promise.all(uploads)
+                const uploadError = results.find(r => r.error)?.error
                 if (uploadError) throw uploadError
-                imagePath = fileName
+
+                imagePath = mainFileName
             }
 
             const articlePayload = {
                 title: form.title,
                 alt_text: form.alt_text?.trim() || '',
-
                 slug: form.slug,
                 district: form.district,
                 content: form.content.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '<h2>$1</h2>'),
@@ -222,14 +264,28 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
                     })
                     .eq('id', editingId.value)
 
-                if (error) throw error
+                if (error) {
+                    // Rollback: remove newly uploaded files
+                    if (mainFileName && thumbFileName) {
+                        const pathsToRemove = [mainFileName, thumbFileName]
+                        supabase.storage
+                            .from('articles')
+                            .remove(pathsToRemove)
+                            .then(({ error: delError }: { error: Error | null }) => {
+                                if (delError) console.warn('Failed to rollback uploaded files:', delError)
+                            })
+                    }
+                    throw error
+                }
 
-                if (imagePath && oldImagePath) {
+                // Clean up old images (main + thumb) only after successful DB update
+                if (oldImagePath && imagePath) {
+                    const pathsToRemove = [oldImagePath, toThumbPath(oldImagePath)]
                     supabase.storage
                         .from('articles')
-                        .remove([oldImagePath])
+                        .remove(pathsToRemove)
                         .then(({ error: delError }: { error: Error | null }) => {
-                            if (delError) console.warn('Failed to clean up old image:', delError)
+                            if (delError) console.warn('Failed to clean up old images:', delError)
                         })
                 }
 
@@ -239,7 +295,20 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
                 const { error } = await (supabase.from('articles') as any)
                     .insert([{ ...articlePayload, image_url: imagePath }])
 
-                if (error) throw error
+                if (error) {
+                    // Rollback: remove newly uploaded files
+                    if (mainFileName && thumbFileName) {
+                        const pathsToRemove = [mainFileName, thumbFileName]
+                        supabase.storage
+                            .from('articles')
+                            .remove(pathsToRemove)
+                            .then(({ error: delError }: { error: Error | null }) => {
+                                if (delError) console.warn('Failed to rollback uploaded files:', delError)
+                            })
+                    }
+                    throw error
+                }
+
                 statusMsg.value = publish ? 'Article published!' : 'Draft saved!'
             }
 
@@ -248,7 +317,6 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
                 if (resetTimerId.value) clearTimeout(resetTimerId.value)
                 resetTimerId.value = setTimeout(() => { resetForm() }, 1500)
             } else {
-                // On edit: clear status message only, keep the form populated
                 if (statusTimerId.value) clearTimeout(statusTimerId.value)
                 statusTimerId.value = setTimeout(() => { statusMsg.value = ''; isError.value = false }, 3000)
             }
@@ -268,7 +336,7 @@ export function useArticleForm(onSuccess: () => Promise<void>) {
 
     return {
         form, isSlugCustom, uploading, statusMsg, isError,
-        editingId, selectedFile,
+        editingId, selectedFile, selectedThumbFile,
         resetForm, handleEdit, handleFileChange,
         handleFormError, uploadArticle, handleTogglePublish,
     }
