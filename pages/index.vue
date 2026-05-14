@@ -68,7 +68,6 @@
               width="400"
               height="160"
               class="card-img"
-              :loading="index === 0 ? 'eager' : 'lazy'"
               :fetchpriority="index === 0 ? 'high' : 'auto'"
               decoding="async"
             />
