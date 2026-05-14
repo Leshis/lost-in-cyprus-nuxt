@@ -78,7 +78,7 @@
             </div>
           </NuxtLink> -->
           <NuxtLink v-for="(loc, index) in filteredLocations" :key="loc.id" :to="`/articles/${loc.slug}`"
-            class="card-link" target="_blank" rel="noopener noreferrer">
+            class="card-link">
             <article class="location-card">
               <img :src="getImageUrl(loc.image_url ?? '')" :srcset="getImageSrcset(loc.image_url ?? '')"
                 :loading="index === 0 ? 'eager' : 'lazy'"
