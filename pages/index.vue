@@ -55,6 +55,11 @@
           <p>Loading Cyprus secrets…</p>
         </div>
 
+        <div v-else-if="error" class="empty-state">
+          <p>Failed to load articles. Please try again.</p>
+          <button @click="refresh()">Retry</button>
+        </div>
+
         <div v-else-if="filteredLocations.length === 0" class="empty-state">
           <p>No secrets found here yet. Try a different category!</p>
           <button @click="resetFilters">Reset filters</button>
@@ -140,7 +145,7 @@ const videoEl = ref<HTMLVideoElement | null>(null)
 // ── Fetch articles server-side ─────────────────────────────────────────────
 // useFetch runs on the server during SSR, embeds data in the HTML response,
 // then reuses it on the client without a second network call.
-const { data: articles, pending } = await useFetch<ArticleCard[]>('/api/articles')
+const { data: articles, pending, error, refresh } = await useFetch<ArticleCard[]>('/api/articles')
 
 const publishedArticles = computed(() => articles.value ?? [])
 
