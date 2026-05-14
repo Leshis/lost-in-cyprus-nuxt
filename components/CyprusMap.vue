@@ -2,10 +2,11 @@
   <div class="map-content-area">
     <svg
       ref="svgEl"
+      :style="{ opacity: isReady ? 1 : 0 }"
       :viewBox="viewBox"
       preserveAspectRatio="xMidYMid meet"
       xmlns="http://www.w3.org/2000/svg"
-      class="map-svg"
+      class="map-svg transition-opacity duration-300"
       @click.self="mapStore.setSelectedDistrict(null)"
     >
       <path
@@ -30,6 +31,7 @@ type DistrictClass = 'district-default' | 'district-active' | 'district-dimmed';
 const mapStore = useMapStore();
 const svgEl = ref<SVGSVGElement | null>(null);
 const viewBox = ref<string>('0 0 700 400');
+const isReady = ref(false);
 
 onMounted(async () => {
   await nextTick();
@@ -42,6 +44,7 @@ onMounted(async () => {
 
   const padding = 20;
   viewBox.value = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
+  isReady.value = true;
 });
 
 const getDistrictClass = (id: string): DistrictClass => {
