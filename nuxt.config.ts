@@ -11,7 +11,6 @@ export default defineNuxtConfig({
       redirect: false
     }],
     '@pinia/nuxt',
-    '@vite-pwa/nuxt',
     'nuxt-schema-org'
   ],
   security: {
@@ -40,42 +39,6 @@ export default defineNuxtConfig({
   site: {
     url: 'https://lostincyprus.netlify.app',
     name: 'Lost in Cyprus'
-  },
-  pwa: {
-    registerType: 'autoUpdate',
-    manifest: {
-      name: 'Lost in Cyprus',
-      short_name: 'Lost in Cyprus',
-      description: 'Discover hidden gems and authentic experiences in Cyprus',
-      theme_color: '#ffffff',
-      background_color: '#ffffff',
-      display: 'standalone',
-      icons: [
-        {
-          src: 'pwa-192x192.png',
-          sizes: '192x192',
-          type: 'image/png'
-        },
-        {
-          src: 'pwa-512x512.png',
-          sizes: '512x512',
-          type: 'image/png'
-        },
-        {
-          src: 'pwa-512x512.png',
-          sizes: '512x512',
-          type: 'image/png',
-          purpose: 'any maskable'
-        }
-      ]
-    },
-    workbox: {
-      navigateFallback: '/'
-    },
-    devOptions: {
-      enabled: true,
-      type: 'module'
-    }
   },
   css: ['~/assets/main.css'],
   runtimeConfig: {
