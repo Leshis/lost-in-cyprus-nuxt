@@ -166,7 +166,7 @@ const resetFilters = (): void => {
 }
 
 useSeoMeta({
-  title: 'Lost In Cyprus | Hidden secrets and untold stories',
+  title: 'Lost In Cyprus - Hidden secrets and untold stories',
   description: 'Discover hidden beaches, abandoned villages, archaeology, hiking trails and untold stories across Cyprus.',
   ogTitle: 'Lost In Cyprus',
   ogDescription: 'Hidden secrets and untold stories across Cyprus.',
