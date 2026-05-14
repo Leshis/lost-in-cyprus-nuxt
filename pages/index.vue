@@ -147,7 +147,9 @@ const videoEl = shallowRef<HTMLVideoElement | null>(null)
 const annotatedArticles = computed<ArticleWithLabel[]>(() =>
   articleStore.publishedArticles.map(a => ({
     ...a,
-    _categoryLabel: a.category?.replace('_', ' ') ?? '',
+    _categoryLabel: a.category
+      ? a.category.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+      : '',
   }))
 )
 
