@@ -6,16 +6,7 @@
       <div class="hero-fallback" />
 
       <ClientOnly>
-        <video
-          ref="videoEl"
-          class="hero-video"
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="none"
-          poster=""
-        >
+        <video ref="videoEl" class="hero-video" autoplay muted loop playsinline preload="none" poster="">
           <!-- <source src="https://YOUR_PROJECT.supabase.co/storage/v1/object/public/videos/hero.mp4" type="video/mp4" /> -->
         </video>
       </ClientOnly>
@@ -35,14 +26,9 @@
 
       <main class="content-section">
         <div class="filter-row">
-          <button
-            v-for="cat in dynamicCategories"
-            :key="cat.id"
-            class="filter-pill"
-            :class="{ active: activeFilter === cat.id }"
-            @click="activeFilter = cat.id"
-            :aria-pressed="activeFilter === cat.id"
-          >
+          <button v-for="cat in dynamicCategories" :key="cat.id" class="filter-pill"
+            :class="{ active: activeFilter === cat.id }" @click="activeFilter = cat.id"
+            :aria-pressed="activeFilter === cat.id">
             {{ cat.label }}
           </button>
         </div>
@@ -66,34 +52,25 @@
         </div>
 
         <div v-else class="card-grid">
-          <div
-            v-for="(loc, index) in filteredLocations"
-            :key="loc.id"
-            class="location-card"
-          >
-            <img
-              :src="getImageUrl(loc.image_url ?? '')"
-              :srcset="getImageSrcset(loc.image_url ?? '')"
-              :loading="index === 0 ? 'eager' : 'lazy'"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-              :alt="loc.alt_text || loc.title"
-              width="400"
-              height="160"
-              class="card-img"
-            />
+          <NuxtLink v-for="(loc, index) in filteredLocations" :key="loc.id" :to="`/articles/${loc.slug}`"
+            class="card-link">
+            <article class="location-card">
+              <img :src="getImageUrl(loc.image_url ?? '')" :srcset="getImageSrcset(loc.image_url ?? '')"
+                :loading="index === 0 ? 'eager' : 'lazy'"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px" :alt="loc.alt_text || loc.title"
+                width="400" height="160" class="card-img" />
 
-            <div class="card-content">
-              <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
-              <h3>{{ loc.title }}</h3>
+              <div class="card-content">
+                <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
+                <h3>{{ loc.title }}</h3>
 
-              <div class="card-footer">
-                <small>{{ loc.district }}</small>
-                <button class="action-btn" @click="handleAction(loc)">
-                  {{ loc.affiliate_url ? 'Book Now' : 'Read More' }}
-                </button>
+                <div class="card-footer">
+                  <small>{{ loc.district }}</small>
+                  <span class="action-btn">Read More</span>
+                </div>
               </div>
-            </div>
-          </div>
+            </article>
+          </NuxtLink>
         </div>
       </main>
     </div>
@@ -134,11 +111,10 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 // types/database.types.ts or inline in the server route
 type ArticleCard = Pick<Article,
   'id' | 'title' | 'slug' | 'category' | 'district' |
-  'image_url' | 'alt_text' | 'affiliate_url'
+  'image_url' | 'alt_text'
 >
 
 const mapStore = useMapStore()
-const router = useRouter()
 const activeFilter = ref<string>('all')
 const videoEl = ref<HTMLVideoElement | null>(null)
 
@@ -189,11 +165,14 @@ const resetFilters = (): void => {
   mapStore.setSelectedDistrict(null)
 }
 
-const handleAction = (loc: ArticleCard): void => {
-  loc.affiliate_url
-    ? window.open(loc.affiliate_url, '_blank', 'noopener,noreferrer')
-    : router.push(`/articles/${loc.slug}`)
-}
+useSeoMeta({
+  title: 'Lost In Cyprus - Hidden secrets and untold stories',
+  description: 'Discover hidden beaches, abandoned villages, archaeology, hiking trails and untold stories across Cyprus.',
+  ogTitle: 'Lost In Cyprus',
+  ogDescription: 'Hidden secrets and untold stories across Cyprus.',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
 </script>
 
 <style scoped>
@@ -209,13 +188,13 @@ const handleAction = (loc: ArticleCard): void => {
   height: 45svh;
   min-height: 260px;
   overflow: hidden;
-  background-color: #1c2a32;
+  background-color: var(--color-navy);
 }
 
 .hero-fallback {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #1c2a32 0%, #2d4a3e 50%, #c69f4b22 100%);
+  background: linear-gradient(135deg, var(--color-navy) 0%, #2d4a3e 50%, var(--color-gold-muted) 100%);
 }
 
 .hero-video {
@@ -229,7 +208,7 @@ const handleAction = (loc: ArticleCard): void => {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 100%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.5) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -241,14 +220,14 @@ const handleAction = (loc: ArticleCard): void => {
 .hero-title {
   font-size: clamp(2rem, 8vw, 3.5rem);
   font-weight: 700;
-  color: #fff;
+  color: var(--text-offwhite);
   letter-spacing: -0.02em;
   margin: 0 0 8px;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
 
 .hero-subtitle {
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
   margin: 0;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -260,13 +239,13 @@ const handleAction = (loc: ArticleCard): void => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #f8f6f0;
+  background-color: var(--bg-warm-light);
 }
 
 .map-section {
   height: 45svh;
   min-height: 280px;
-  background-color: #fdfcf8;
+  background-color: var(--bg-warm-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -274,7 +253,7 @@ const handleAction = (loc: ArticleCard): void => {
 
 .content-section {
   flex: 1;
-  background-color: #f8f6f0;
+  background-color: var(--bg-warm);
   overflow-y: auto;
   padding: 20px 16px;
   border-radius: 20px 20px 0 0;
@@ -293,13 +272,15 @@ const handleAction = (loc: ArticleCard): void => {
   scrollbar-width: none;
 }
 
-.filter-row::-webkit-scrollbar { display: none; }
+.filter-row::-webkit-scrollbar {
+  display: none;
+}
 
 .filter-pill {
   flex-shrink: 0;
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-light);
   background: white;
   white-space: nowrap;
   cursor: pointer;
@@ -307,19 +288,21 @@ const handleAction = (loc: ArticleCard): void => {
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
-.filter-pill:hover { background: rgba(0, 0, 0, 0.06); }
+.filter-pill:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
 
 .filter-pill.active {
-  background: #c69f4b;
+  background: var(--color-gold);
   color: white;
-  border-color: #c69f4b;
+  border-color: var(--color-gold);
 }
 
 /* ─── Results header ────────────────────────────────────────────────────── */
 .results-header {
   margin: 0 0 16px;
   font-size: 1rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 /* ─── States ────────────────────────────────────────────────────────────── */
@@ -327,14 +310,14 @@ const handleAction = (loc: ArticleCard): void => {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #666;
+  color: var(--text-muted);
   font-style: italic;
 }
 
 .empty-state button {
   margin-top: 12px;
-  background: #1c2a32;
-  color: white;
+  background: var(--color-navy);
+  color: var(--text-offwhite);
   border: none;
   padding: 8px 20px;
   border-radius: 8px;
@@ -360,27 +343,34 @@ const handleAction = (loc: ArticleCard): void => {
   width: 100%;
   height: 160px;
   object-fit: cover;
-  background-color: #eee;
+  background-color: var(--bg-warm);
   transition: transform 0.4s ease;
 }
 
-.location-card:hover .card-img { transform: scale(1.05); }
+.location-card:hover .card-img {
+  transform: scale(1.05);
+}
 
-.card-content { padding: 16px; }
+.card-content {
+  padding: 16px;
+}
 
 .category-tag {
   font-size: 0.7rem;
   text-transform: uppercase;
-  color: #c69f4b;
+  color: var(--color-gold);
   font-weight: bold;
   letter-spacing: 0.5px;
 }
 
-.card-content h3 { margin: 4px 0; color: #1a1a1a; }
+.card-content h3 {
+  margin: 4px 0;
+  color: var(--text-primary);
+}
 
 .card-content p {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-muted);
   margin-bottom: 12px;
 }
 
@@ -388,15 +378,24 @@ const handleAction = (loc: ArticleCard): void => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-light);
   padding-top: 12px;
 }
 
-.card-footer small { text-transform: capitalize; color: #999; }
+.card-footer small {
+  text-transform: capitalize;
+  color: var(--text-muted);
+}
+
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
 
 .action-btn {
-  background: #1c2a32;
-  color: white;
+  background: var(--color-navy);
+  color: var(--text-offwhite);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -405,11 +404,15 @@ const handleAction = (loc: ArticleCard): void => {
   transition: background 0.2s, color 0.2s;
 }
 
-.action-btn:hover { background: rgba(0, 0, 0, 0.56); }
+.action-btn:hover {
+  background: rgba(0, 0, 0, 0.56);
+}
 
 /* ─── Desktop ───────────────────────────────────────────────────────────── */
 @media (min-width: 1024px) {
-  .hero { height: 50svh; }
+  .hero {
+    height: 50svh;
+  }
 
   .app-container {
     flex-direction: row;

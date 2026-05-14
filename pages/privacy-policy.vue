@@ -87,14 +87,6 @@
   margin: 0 auto;
 }
 
-.header-title {
-  font-family: var(--font-heading);
-  font-size: var(--size-2xl);
-  font-weight: var(--weight-bold);
-  margin-bottom: var(--space-2);
-  color: var(--color-navy);
-}
-
 .header-meta {
   font-size: var(--size-sm);
   color: var(--color-text-muted);

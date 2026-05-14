@@ -4,7 +4,6 @@
   --color-navy: #1c2a32;
   --color-gold: #c69f4b;
   --color-gold-muted: rgba(198, 159, 75, 0.13);
-  /* Add to :root in main.css */
   --color-copper: #b57b52;
   --color-copper-dark: #a06a45;
   --color-copper-shadow: rgba(181, 123, 82, 0.2);
@@ -26,6 +25,7 @@
   --text-body: #666666;
   --text-muted: #999999;
   --text-white: #ffffff;
+  --text-offwhite: #f4f4f4;
 
   /* Borders */
   --border-light: #eeeeee;
