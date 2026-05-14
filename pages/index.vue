@@ -5,11 +5,18 @@
     <section class="hero">
       <div class="hero-fallback" />
 
-      <ClientOnly>
-        <video ref="videoEl" class="hero-video" autoplay muted loop playsinline preload="none" poster="">
-          <!-- <source src="https://YOUR_PROJECT.supabase.co/storage/v1/object/public/videos/hero.mp4" type="video/mp4" /> -->
-        </video>
-      </ClientOnly>
+      <video 
+    ref="videoEl" 
+    class="hero-video" 
+    autoplay 
+    muted 
+    loop 
+    playsinline 
+    poster="/hero-placeholder.webp"
+      >
+    <!-- We leave the source blank or commented out for now -->
+    <!-- <source src="/videos/hero.mp4" type="video/mp4" /> -->
+  </video>
 
       <div class="hero-overlay">
         <h1 class="hero-title">Lost In Cyprus</h1>
