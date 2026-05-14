@@ -1,6 +1,5 @@
 <template>
   <div class="page">
-
     <section class="hero" v-once>
       <div class="hero-fallback" />
       <video
@@ -15,7 +14,6 @@
         <p class="hero-subtitle">Hidden secrets, untold stories</p>
       </div>
     </section>
-
     <div class="app-container">
       <aside class="map-section">
         <Suspense>
