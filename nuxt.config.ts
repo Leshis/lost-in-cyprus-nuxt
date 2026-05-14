@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     'nuxt-schema-org'
   ],
+  routeRules: {
+    '/': { prerender: true }
+  },
   security: {
     enabled: process.env.NODE_ENV === 'production',
     headers: {
