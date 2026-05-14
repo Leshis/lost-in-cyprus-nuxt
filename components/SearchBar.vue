@@ -1,12 +1,12 @@
 <template>
-  <!-- MOBILE VARIANT -->
+  <!-- NAVBAR VARIANT -->
   <div v-if="variant === 'nav'" class="search-wrapper" ref="searchWrapper">
-    <div class="search-bar" :class="{ active: searchOpen }">
-      <button class="search-icon-btn" @click="openSearch" aria-label="Search">
+    <div class="search-bar" :class="{ active: searchOpen }" @click="openSearch">
+      <div class="search-icon-btn" aria-label="Search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
         </svg>
-      </button>
+      </div>
       <input v-if="searchOpen" ref="searchInput" v-model="searchQuery"
         type="text" placeholder="Search Cyprus..." class="search-input" @keydown.escape="close" />
       <button v-if="searchOpen && searchQuery" class="clear-btn" @click="searchQuery = ''">
@@ -33,7 +33,7 @@
     </Transition>
   </div>
 
-  <!-- INLINE VARIANT -->
+  <!-- MENU VARIANT -->
   <div v-else class="search-section">
     <div v-if="!searchOpen" @click="searchOpen = true" class="pill-search-btn">
       🔍 SEARCH
@@ -201,30 +201,48 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
   border-radius: 999px;
   padding: 0 6px 0 10px;
   height: 38px;
-  transition: width 0.3s ease, border-color 0.2s;
+  transition:
+    width 0.3s ease,
+    border-color 0.2s,
+    background 0.2s;
   width: 38px;
   overflow: hidden;
 }
 
+.search-bar:hover {
+  background: var(--color-copper);
+  border-color: var(--color-copper);
+  cursor: pointer;
+}
+
+.search-bar:hover .search-icon-btn {
+  color: var(--text-offwhite);
+}
+
+.search-bar:is(.active):hover .search-icon-btn {
+  color: var(--color-text-muted);
+}
+
+.search-bar:is(.active):hover {
+  background: white;
+  border-color: var(--color-gold);
+}
+
 .search-bar.active {
   width: 320px;
-  border-color: #b57b52;
+  border-color: var(--color-gold);
 }
 
 .search-icon-btn {
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   padding: 0;
   flex-shrink: 0;
   transition: color 0.2s;
-}
-
-.search-icon-btn:hover {
-  color: #b57b52;
 }
 
 .search-input {
