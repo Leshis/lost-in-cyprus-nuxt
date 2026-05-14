@@ -52,31 +52,6 @@
         </div>
 
         <div v-else class="card-grid">
-          <!-- <NuxtLink :to="`/articles/${loc.slug}`" class="location-card"
-            v-for="(loc, index) in filteredLocations" :key="loc.id">
-            <img
-              :src="getImageUrl(loc.image_url ?? '')"
-              :srcset="getImageSrcset(loc.image_url ?? '')"
-              :loading="index === 0 ? 'eager' : 'lazy'"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-              :alt="loc.alt_text || loc.title"
-              width="400"
-              height="160"
-              class="card-img"
-            />
-
-            <div class="card-content">
-              <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
-              <h3>{{ loc.title }}</h3>
-
-              <div class="card-footer">
-                <small>{{ loc.district }}</small>
-                <button class="action-btn" @click.prevent="handleAction(loc)">
-                  {{ loc.affiliate_url ? 'Book Now' : 'Read More' }}
-                </button>
-              </div>
-            </div>
-          </NuxtLink> -->
           <NuxtLink v-for="(loc, index) in filteredLocations" :key="loc.id" :to="`/articles/${loc.slug}`"
             class="card-link" target="_blank" rel="noopener noreferrer">
             <article class="location-card">
@@ -136,7 +111,7 @@ const CATEGORY_EMOJIS: Record<string, string> = {
 // types/database.types.ts or inline in the server route
 type ArticleCard = Pick<Article,
   'id' | 'title' | 'slug' | 'category' | 'district' |
-  'image_url' | 'alt_text' | 'affiliate_url'
+  'image_url' | 'alt_text'
 >
 
 const mapStore = useMapStore()
@@ -189,12 +164,6 @@ const filteredLocations = computed<ArticleCard[]>(() =>
 const resetFilters = (): void => {
   activeFilter.value = 'all'
   mapStore.setSelectedDistrict(null)
-}
-
-const handleAction = (loc: ArticleCard): void => {
-  loc.affiliate_url
-    ? window.open(loc.affiliate_url, '_blank', 'noopener,noreferrer')
-    : router.push(`/articles/${loc.slug}`)
 }
 
 useSeoMeta({
