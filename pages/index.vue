@@ -69,7 +69,7 @@
               :src="getImageUrl(loc.image_url ?? '')"
               :srcset="getImageSrcset(loc.image_url ?? '')"
               :loading="index === 0 ? 'eager' : 'lazy'"
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
               :alt="loc.title"
               width="400"
               height="160"
