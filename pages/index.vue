@@ -62,11 +62,17 @@
           <NuxtLink v-for="(loc, index) in filteredLocations" :key="loc.id" :to="`/articles/${loc.slug}`"
             class="card-link">
             <article class="location-card">
-              <img :src="getImageUrl(loc.image_url ?? '')" :srcset="getImageSrcset(loc.image_url ?? '')"
+              <NuxtImg 
+                :src="`supabase/${loc.image_url}`" 
+                :alt="loc.alt_text || loc.title"
                 :loading="index === 0 ? 'eager' : 'lazy'"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px" :alt="loc.alt_text || loc.title"
-                width="400" height="160" class="card-img" />
-
+                :preload="index === 0"
+                width="400"
+                height="160"
+                sizes="xs:100vw sm:100vw md:50vw lg:400px"
+                format="webp"
+                class="card-img"
+                />
               <div class="card-content">
                 <span class="category-tag">{{ loc.category.replace('_', ' ') }}</span>
                 <h3>{{ loc.title }}</h3>

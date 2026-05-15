@@ -11,8 +11,15 @@ export default defineNuxtConfig({
       redirect: false
     }],
     '@pinia/nuxt',
-    'nuxt-schema-org'
+    'nuxt-schema-org',
+    '@nuxt/image'
   ],
+  image: {
+    domains: process.env.SUPABASE_URL ? [new URL(process.env.SUPABASE_URL).hostname] : [],
+    alias: {
+      supabase: process.env.SUPABASE_URL ? process.env.SUPABASE_URL + '/storage/v1/object/public/articles' : ''
+    }
+  },
   routeRules: {
     '/': { prerender: true }
   },
