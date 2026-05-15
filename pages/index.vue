@@ -63,7 +63,7 @@
             class="card-link">
             <article class="location-card">
               <NuxtImg 
-                :src="supabase/${loc.image_url}" 
+                :src="`supabase/${loc.image_url}`" 
                 :alt="loc.alt_text || loc.title"
                 :loading="index === 0 ? 'eager' : 'lazy'"
                 :preload="index === 0"
