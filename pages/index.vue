@@ -70,7 +70,6 @@
                 width="400"
                 height="160"
                 sizes="xs:100vw sm:100vw md:50vw lg:400px"
-                format="webp"
                 class="card-img"
                 />
               <div class="card-content">
