@@ -15,9 +15,9 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
   image: {
-    domains: ['${process.env.SUPABASE_URL}.supabase.co'],
-    alias: { 
-      supabase: 'https://${process.env.SUPABASE_URL}.supabase.co/storage/v1/object/public/articles' 
+    domains: process.env.SUPABASE_URL ? [new URL(process.env.SUPABASE_URL).hostname] : [],
+    alias: {
+      supabase: process.env.SUPABASE_URL ? process.env.SUPABASE_URL + '/storage/v1/object/public/articles' : ''
     }
   },
   routeRules: {
