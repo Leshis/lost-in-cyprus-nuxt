@@ -19,7 +19,8 @@
     "nuxt-schema-org": "^6.0.4",
     "nuxt-security": "^2.6.0",
     "vue": "^3.5.33",
-    "vue-router": "^5.0.6"
+    "vue-router": "^5.0.6",
+    "@nuxt/image": "^2.0.0"
   },
   "devDependencies": {
     "@nuxtjs/sitemap": "^8.0.15",
