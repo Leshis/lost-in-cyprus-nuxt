@@ -11,8 +11,15 @@ export default defineNuxtConfig({
       redirect: false
     }],
     '@pinia/nuxt',
-    'nuxt-schema-org'
+    'nuxt-schema-org',
+    '@nuxt/image'
   ],
+  image: {
+    domains: ['bwxqxgjwpsurptaduwii.supabase.co'],
+    alias: { 
+      supabase: 'https://bwxqxgjwpsurptaduwii.supabase.co/storage/v1/object/public/articles' 
+    }
+  },
   routeRules: {
     '/': { prerender: true }
   },
