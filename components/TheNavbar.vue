@@ -2,7 +2,14 @@
   <nav class="navbar">
     <div class="nav-content">
       <router-link to="/" class="logo-link">
-        <img src="/lost-in-cyprus.webp" alt="Logo" class="cyprus-icon" width="36" height="36"/>
+        <NuxtImg 
+          src="/lost-in-cyprus.webp" 
+          alt="Lost In Cyprus Logo" 
+          class="cyprus-icon" 
+          width="36" 
+          height="36"
+          preload
+        />
       </router-link>
 
       <div class="desktop-nav">
