@@ -75,15 +75,14 @@ const sanitizedContent = ref('')
 
 onMounted(async () => {
   const DOMPurify = (await import('dompurify')).default
-
-  watchEffect(() => {
-    const safe = DOMPurify.sanitize(props.article.content ?? '')
-    if (!safe) { sanitizedContent.value = ''; return }
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(safe, 'text/html')
-    doc.querySelectorAll('img').forEach(img => img.setAttribute('loading', 'lazy'))
-    sanitizedContent.value = doc.body.innerHTML
-  })
+onMounted(async () => {
+  const DOMPurify = (await import('dompurify')).default
+  const safe = DOMPurify.sanitize(props.article.content ?? '')
+  if (!safe) { sanitizedContent.value = ''; return }
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(safe, 'text/html')
+  doc.querySelectorAll('img').forEach(img => img.setAttribute('loading', 'lazy'))
+  sanitizedContent.value = doc.body.innerHTML
 })
 
 const capitalise = (value?: string): string => {
