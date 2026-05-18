@@ -10,7 +10,15 @@
     >
       <div class="menu-card">
         <div class="menu-header">
-          <img src="/lost-in-cyprus.webp" class="menu-logo-small" alt="Lost in Cyprus" />
+          <NuxtImg 
+  src="/lost-in-cyprus.webp" 
+  class="menu-logo-small" 
+  alt="Lost in Cyprus"
+  width="36" 
+  height="36" 
+  loading="lazy"
+/>
+          
           <button class="close-x" @click="emit('close')" aria-label="Close menu">✕</button>
         </div>
 
