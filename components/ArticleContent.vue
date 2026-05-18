@@ -75,8 +75,6 @@ const sanitizedContent = ref('')
 
 onMounted(async () => {
   const DOMPurify = (await import('dompurify')).default
-onMounted(async () => {
-  const DOMPurify = (await import('dompurify')).default
   const safe = DOMPurify.sanitize(props.article.content ?? '')
   if (!safe) { sanitizedContent.value = ''; return }
   const parser = new DOMParser()
