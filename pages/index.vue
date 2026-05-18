@@ -257,7 +257,10 @@ useHead({
   htmlAttrs: { lang: 'en' },
   link: [
     { rel: 'canonical', href: SITE_URL },
-    { rel: 'preconnect', href: 'https://your-project.supabase.co' }
+    { 
+      rel: 'preconnect', 
+      href: (nuxtApp.$config.public.supabaseUrl as string) ?? 'https://your-project.supabase.co' 
+    }
   ]
 })
 </script>
