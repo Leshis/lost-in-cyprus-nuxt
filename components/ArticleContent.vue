@@ -1,20 +1,23 @@
 <template>
   <div class="article-page">
     <header class="article-hero">
-      <img
-    v-if="article.image_url"
-    :src="getImageUrl(article.image_url)"
-    :srcset="getImageSrcset(article.image_url)"
-    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
-    :alt="article.alt_text || article.title"
-    class="hero-bg-img"
-    fetchpriority="high"
-    width="1200"
-    height="600"
-  />
+      <NuxtImg
+  v-if="article.image_url"
+  :src="`supabase/${article.image_url}`"
+  :alt="article.alt_text || article.title"
+  class="hero-bg-img"
+  width="1200"
+  height="600"
+  sizes="xs:100vw sm:100vw md:100vw lg:100vw"
+  format="webp"
+  quality="80"
+  densities="1x 2x"
+  loading="eager"
+  fetchpriority="high"
+  preload
+/>
       <div v-else class="hero-bg-img fallback-bg" />
 
-      <!-- Back button lives in its own bar, separate from the hero text -->
       <nav v-if="!isPreview" class="hero-nav">
         <button @click="$emit('back')" class="back-btn" aria-label="Go back">
           <span class="back-arrow">←</span>
@@ -51,33 +54,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from 'vue'
-import { getImageUrl } from '@/utils/supabaseHelpers'
-import { getImageSrcset } from '@/utils/supabaseHelpers'
-import type { Article } from '~/types/database.types';
+import type { Article } from '~/types/database.types'
 
 type PreviewArticle = Omit<Article, 'id' | 'image_url' | 'created_at'> & {
   id?: number
   image_url?: string | null
   created_at?: string
 }
-
-const sanitizedContent = ref('')
-
-onMounted(async () => {
-  // Dynamically import only on client
-  const DOMPurify = (await import('dompurify')).default
-
-  // Move your existing computed logic here
-  watchEffect(() => {
-    const safe = DOMPurify.sanitize(props.article.content ?? '')
-    if (!safe) { sanitizedContent.value = ''; return }
-    const parser = new DOMParser()
-    const doc = parser.parseFromString(safe, 'text/html')
-    doc.querySelectorAll('img').forEach(img => img.setAttribute('loading', 'lazy'))
-    sanitizedContent.value = doc.body.innerHTML
-  })
-})
 
 const props = defineProps<{
   article: PreviewArticle
@@ -87,6 +70,18 @@ const props = defineProps<{
 defineEmits<{
   back: []
 }>()
+
+const sanitizedContent = ref('')
+
+onMounted(async () => {
+  const DOMPurify = (await import('dompurify')).default
+  const safe = DOMPurify.sanitize(props.article.content ?? '')
+  if (!safe) { sanitizedContent.value = ''; return }
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(safe, 'text/html')
+  doc.querySelectorAll('img').forEach(img => img.setAttribute('loading', 'lazy'))
+  sanitizedContent.value = doc.body.innerHTML
+})
 
 const capitalise = (value?: string): string => {
   if (!value) return 'District'
@@ -102,7 +97,7 @@ const formatDate = (dateString?: string): string => {
   })
 }
 </script>
-
+      
 <style scoped>
 .article-page {
   background: #f8f6f0;
