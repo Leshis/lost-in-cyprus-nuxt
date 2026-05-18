@@ -23,7 +23,8 @@ export default defineNuxtConfig({
     format: ['avif', 'webp']
   },
   routeRules: {
-    '/': { prerender: true }
+    '/': { prerender: true },
+    '/**': { prerender: true }
   },
   security: {
     enabled: process.env.NODE_ENV === 'production',
