@@ -413,7 +413,7 @@ useHead({
     90deg,
     var(--bg-warm-light) 25%,
     var(--border-light) 50%,
-    var(--bg-warm-light) 75
+    var(--bg-warm-light) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
