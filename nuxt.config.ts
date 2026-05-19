@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
   image: {
+    provider: 'ipx', 
     domains: process.env.SUPABASE_URL ? [new URL(process.env.SUPABASE_URL).hostname] : [],
     alias: {
       supabase: process.env.SUPABASE_URL ? process.env.SUPABASE_URL + '/storage/v1/object/public/articles' : ''
@@ -93,8 +94,7 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       routes: ['/'],
-      crawlLinks: true,
-      ignore: [/^\/\.netlify\/images/]
+      crawlLinks: true
     }
   }
 })
