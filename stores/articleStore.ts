@@ -60,6 +60,9 @@ export const useArticleStore = defineStore('articles', {
 
   actions: {
     async fetchArticles(force = false): Promise<void> {
+      // Guard against concurrent duplicate requests
+      if (this.loading) return
+
       const supabase = useSupabaseClient()
       if (!force && this.lastFetched && Date.now() - this.lastFetched < LIST_TTL) return
 
@@ -70,14 +73,18 @@ export const useArticleStore = defineStore('articles', {
           .from('articles')
           .select('id, title, slug, district, category, is_published, scheduled_from, scheduled_to, image_url, created_at')
           .order('created_at', { ascending: false })
+          .returns<ArticleSummary[]>()
+
         if (error) throw error
 
         const existingById = new Map(this.items.map((i) => [i.id, i]))
-        const incoming = (data ?? []) as ArticleSummary[]
+        const incoming = data ?? []
+        
         this.items = incoming.map((fresh) => {
           const existing = existingById.get(fresh.id)
-          return existing?.content ? { ...fresh, content: existing.content } : fresh as Article
+          return existing?.content ? { ...fresh, content: existing.content } : (fresh as Article)
         })
+        
         this.lastFetched = Date.now()
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to fetch articles'
@@ -93,7 +100,9 @@ export const useArticleStore = defineStore('articles', {
       const lastFetched = this.lastSlugFetched[slug] ?? null
       const cacheIsFresh = lastFetched !== null && Date.now() - lastFetched < SLUG_TTL
       const cached = this.getPublishedArticleBySlug(slug)
+      
       if (cacheIsFresh && cached?.content) return
+      if (this.loading) return
 
       this.loading = true
       this.error = null
@@ -133,6 +142,8 @@ export const useArticleStore = defineStore('articles', {
     },
 
     async fetchArticleBySlugAdmin(slug: string): Promise<void> {
+      if (this.loading) return
+
       const supabase = useSupabaseClient()
       this.loading = true
       this.error = null
