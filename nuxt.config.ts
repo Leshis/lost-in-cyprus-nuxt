@@ -91,15 +91,9 @@ export default defineNuxtConfig({
       ],
     },
   },
-  experimental: {
-    viteEnvironmentApi: true
-  },
   vite: {
     build: {
       sourcemap: false
     }
-  },
-  nitro: {
-    preset: 'netlify' // Forces Nitro to build into the modern .output architecture natively
   }
 })
