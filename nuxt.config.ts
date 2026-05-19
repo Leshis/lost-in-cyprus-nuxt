@@ -25,9 +25,7 @@ export default defineNuxtConfig({
     '/': { prerender: true },
     '/about': { prerender: true },
     '/privacy-policy': { prerender: true },
-    '/contact': { prerender: true },
-    '/preview/**': { ssr: false },
-    '/article/**': { ssr: true },
+    '/contact': { prerender: true }
   },
   
   security: {
