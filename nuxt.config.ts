@@ -98,5 +98,8 @@ export default defineNuxtConfig({
     build: {
       sourcemap: false
     }
+  },
+  nitro: {
+    preset: 'netlify' // Forces Nitro to build into the modern .output architecture natively
   }
 })
