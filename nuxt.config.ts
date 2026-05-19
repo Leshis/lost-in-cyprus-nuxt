@@ -89,5 +89,11 @@ export default defineNuxtConfig({
     build: {
       sourcemap: false
     }
+  },
+  nitro: {
+    prerender: {
+      routes: ['/'],
+      crawlLinks: true
+    }
   }
 })
