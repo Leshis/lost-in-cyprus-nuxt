@@ -19,13 +19,9 @@ export default defineNuxtConfig({
     alias: {
       supabase: process.env.SUPABASE_URL ? process.env.SUPABASE_URL + '/storage/v1/object/public/articles' : ''
     },
-    provider: 'ipx',
     format: ['avif', 'webp']
   },
-  routeRules: {
-    '/': { prerender: true },
-    '/**': { prerender: true }
-  },
+
   security: {
     enabled: process.env.NODE_ENV === 'production',
     headers: {
@@ -71,7 +67,7 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'en' },
       title: 'Lost in Cyprus',
       meta: [
-        { name: 'theme-color', content: '#ffffff' }, // Fixes "Does not set a theme color"
+        { name: 'theme-color', content: '#ffffff' },
         { name: 'description', content: 'Discover hidden gems and authentic experiences in Cyprus' },
         { property: 'og:title', content: 'Lost in Cyprus' },
         { property: 'og:description', content: 'Discover hidden gems and authentic experiences in Cyprus' },
@@ -84,17 +80,27 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', href: '/lost-in-cyprus.webp' },
-        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }, // Fixes "apple-touch-icon" error
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'canonical', href: 'https://lostincyprus.netlify.app' }
       ],
     },
   },
-  experimental: {
-    viteEnvironmentApi: true
-  },
   vite: {
     build: {
       sourcemap: false
+    }
+  },
+  nitro: {
+    preset: 'netlify',
+    prerender: {
+      crawlLinks: true,
+      failOnError: false, 
+      routes: [
+        '/',
+        '/about',
+        '/privacy-policy',
+        '/contact'
+      ]
     }
   }
 })
