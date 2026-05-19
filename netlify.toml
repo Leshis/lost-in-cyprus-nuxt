@@ -1,5 +1,6 @@
 [build]
   command = "npm run build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "24"
@@ -7,3 +8,10 @@
 [functions]
   directory = ".netlify/functions-internal"
   node_bundler = "esbuild"
+
+# Tells Netlify to send dynamic /article paths straight to Nuxt instead of bouncing to /
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+  
