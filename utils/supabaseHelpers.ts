@@ -23,5 +23,6 @@ export const getImageUrl = (
   const base = buildStorageBase(supabaseUrl)
   if (!base) return FALLBACK_IMAGE
 
-  return `${base}/${bucket}/${path}`
+  const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/')
+  return `${base}/${bucket}/${encodedPath}`
 }
