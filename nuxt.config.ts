@@ -21,13 +21,7 @@ export default defineNuxtConfig({
     },
     format: ['avif', 'webp']
   },
-    routeRules: {
-    '/': { prerender: true },
-    '/about': { prerender: true },
-    '/privacy-policy': { prerender: true },
-    '/contact': { prerender: true }
-  },
-  
+
   security: {
     enabled: process.env.NODE_ENV === 'production',
     headers: {
@@ -95,5 +89,16 @@ export default defineNuxtConfig({
     build: {
       sourcemap: false
     }
-  }
+  },
+  nitro: {
+    preset: 'netlify',
+    prerender: {
+      crawlLinks: true, // Automatically discovers your links via anchor tags
+      routes: [
+        '/',
+        '/about',
+        '/privacy-policy',
+        '/contact'
+      ]
+    }
 })
