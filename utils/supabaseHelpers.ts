@@ -1,22 +1,28 @@
-export const getImageUrl = (path: string) => {
-  if (!path) return 'https://placehold.jp/24/1c2a32/ffffff/150x150.png?text=LostInCyprus';
+const FALLBACK_IMAGE = 'https://placehold.jp/24/1c2a32/ffffff/150x150.png?text=LostInCyprus'
+const DEFAULT_BUCKET = 'articles'
 
-  const config = useRuntimeConfig();
-  const projectID = (config.public.supabaseUrl as string)
-    ?.match(/https:\/\/(.+)\.supabase\.co/)?.[1]
-  const bucketName = 'articles';
-  if (!projectID) return ''
-  return `https://${projectID}.supabase.co/storage/v1/object/public/${bucketName}/${path}`;
-};
+const extractProjectId = (supabaseUrl: string): string | null =>
+  supabaseUrl?.match(/https:\/\/(.+)\.supabase\.co/)?.[1] ?? null
 
-// Derives the thumbnail path from the main image path
-// e.g. "abc123.webp" -> "abc123_thumb.webp"
-const toThumbPath = (path: string) => path.replace(/(\.[^.]+)$/, '_thumb$1')
+const buildStorageBase = (supabaseUrl: string): string | null => {
+  const projectId = extractProjectId(supabaseUrl)
+  if (!projectId) {
+    console.warn('[supabaseHelper] Could not extract project ID from Supabase URL.')
+    return null
+  }
+  return `https://${projectId}.supabase.co/storage/v1/object/public`
+}
 
-export const getImageSrcset = (path: string) => {
-  if (!path) return ''
-  const fullUrl  = getImageUrl(path)
-  const thumbUrl = getImageUrl(toThumbPath(path))
-  if (!fullUrl || !thumbUrl) return ''
-  return `${thumbUrl} 400w, ${fullUrl} 800w`
+export const getImageUrl = (
+  path: string,
+  supabaseUrl: string,
+  bucket: string = DEFAULT_BUCKET
+): string => {
+  if (!path) return FALLBACK_IMAGE
+
+  const base = buildStorageBase(supabaseUrl)
+  if (!base) return FALLBACK_IMAGE
+
+  const encodedPath = path.split('/').map(segment => encodeURIComponent(segment)).join('/')
+  return `${base}/${bucket}/${encodedPath}`
 }

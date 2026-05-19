@@ -29,6 +29,7 @@ import { getImageUrl } from '@/utils/supabaseHelpers'
 const route = useRoute()
 const router = useRouter()
 const articleStore = useArticleStore()
+const { public: { supabaseUrl } } = useRuntimeConfig()
 
 const isLoading = ref(false)
 const isPreview = computed(() => route.name === 'ArticlePreview')
@@ -74,14 +75,18 @@ useSeoMeta({
   ogType: 'article',
   ogTitle: () => article.value?.title ?? 'Lost in Cyprus',
   ogDescription: articleDescription,
-  ogImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+  ogImage: () => article.value?.image_url
+  ? getImageUrl(article.value.image_url, supabaseUrl)
+  : undefined,
   ogUrl: () => siteBaseUrl.value ? `${siteBaseUrl.value}/articles/${encodeURIComponent(currentSlug.value)}` : undefined,
 
   // Twitter / X
   twitterCard: 'summary_large_image',
   twitterTitle: () => article.value?.title ?? 'Lost in Cyprus',
   twitterDescription: articleDescription,
-  twitterImage: () => article.value?.image_url ? getImageUrl(article.value.image_url) : undefined,
+  twitterImage: () => article.value?.image_url
+  ? getImageUrl(article.value.image_url, supabaseUrl)
+  : undefined,
 })
 
 useSchemaOrg(() => {
@@ -92,7 +97,9 @@ useSchemaOrg(() => {
       author: { name: 'Lost in Cyprus' },
       headline: article.value.title,
       description: articleDescription.value,
-      image: article.value.image_url ? getImageUrl(article.value.image_url) : undefined,
+      image: article.value.image_url
+  ? getImageUrl(article.value.image_url, supabaseUrl)
+  : undefined,
       datePublished: article.value.created_at
     })
   ]
