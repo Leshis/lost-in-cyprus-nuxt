@@ -7,20 +7,10 @@
 
       <h1 class="error-code">{{ error?.statusCode || error?.status || 'Error' }}</h1>
       <h2 class="error-title">{{ errorTitle }}</h2>
-<pre style="white-space: pre-wrap; font-size: 12px;">
-      {{ JSON.stringify(error, null, 2) }}
-    </pre>
-    <button @click="handleError">Go Home</button>
-      <!--<p class="error-message">
-        {{ errorMessage }}
-      </p>
 
-      <div class="error-actions">
-        <button class="btn-primary" @click="handleError">
-          Back to the Map
-        </button>
-      </div>-->
-    </div>
+      <pre style="white-space: pre-wrap; font-size: 12px; text-align: left; background: #111; color: #eee; padding: 12px; border-radius: 8px; margin: 16px 0;">{{ JSON.stringify(error, null, 2) }}</pre>
+      <button @click="handleError">Go Home</button>
+      </div>
 
     <div class="bg-blob blob-1" />
     <div class="bg-blob blob-2" />
@@ -31,10 +21,17 @@
 import { clearError } from '#app'
 import { computed } from 'vue'
 
-
 const error = useError()
+
+const errorTitle = computed(() => {
+  const statusCode = error.value?.statusCode || error.value?.status
+  if (statusCode === 404) return 'Lost in Cyprus'
+  return 'Something Went Wrong'
+})
+
 const handleError = () => clearError({ redirect: '/' })
-<!--
+
+/*
 const props = defineProps<{
   error?: {
     statusCode?: number
@@ -59,8 +56,10 @@ const errorMessage = computed(() => {
   return 'An unexpected error occurred. Please try again later.'
 })
 
-const handleError = () => clearError({ redirect: '/' })-->
+const handleError = () => clearError({ redirect: '/' })
+*/
 </script>
+
 
 <style scoped>
 .error-page {
