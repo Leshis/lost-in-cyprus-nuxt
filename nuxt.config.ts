@@ -21,10 +21,15 @@ export default defineNuxtConfig({
     },
     format: ['avif', 'webp']
   },
-  routeRules: {
+    routeRules: {
     '/': { prerender: true },
-    '/**': { prerender: true }
+    '/about': { prerender: true },
+    '/privacy-policy': { prerender: true },
+    '/contact': { prerender: true },
+    '/preview/**': { ssr: false },
+    '/article/**': { ssr: true },
   },
+  
   security: {
     enabled: process.env.NODE_ENV === 'production',
     headers: {
