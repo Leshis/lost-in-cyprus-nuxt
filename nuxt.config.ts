@@ -89,17 +89,5 @@ export default defineNuxtConfig({
     build: {
       sourcemap: false
     }
-  },
-  nitro: {
-    prerender: {
-      crawlLinks: true,
-      failOnError: false, 
-      routes: [
-        '/',
-        '/about',
-        '/privacy-policy',
-        '/contact'
-      ]
-    }
   }
 })
