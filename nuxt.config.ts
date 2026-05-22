@@ -91,11 +91,11 @@ export default defineNuxtConfig({
       sourcemap: false
     }
   },
-  nitro: {
-    prerender: {
-      routes: ['/'],
-      // crawlLinks: true,
-      // ignore: ['/gate/**']
-    }
-  }
+  // nitro: {
+  //   prerender: {
+  //     routes: ['/'],
+  //     // crawlLinks: true,
+  //     // ignore: ['/gate/**']
+  //   }
+  // }
 })
