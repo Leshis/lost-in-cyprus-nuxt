@@ -91,17 +91,11 @@ export default defineNuxtConfig({
       sourcemap: false
     }
   },
-  nitro: {
-    // 1. Pre-render your homepage for max speed
-    prerender: {
-      routes: ['/']
-    },
-    // 2. Explicitly tell the build engine to treat /gate as a clean server-function boundary
-    publicAssets: [
-      {
-        baseURL: '/gate',
-        fallthrough: false // Stops Netlify from falling back to index.html for these paths
-      }
-    ]
+  routeRules: {
+    // 1. Force the home page to be statically pre-rendered at build time
+    '/': { prerender: true },
+    
+    // 2. Explicitly leave /gate out of it so it renders exclusively at request-time
+    '/gate/**': { ssr: true }
   }
 })
