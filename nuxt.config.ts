@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   },
 
   security: {
-    enabled: process.env.NODE_ENV === 'production',
+    enabled: false, //process.env.NODE_ENV === 'production',
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],
