@@ -96,6 +96,14 @@ export default defineNuxtConfig({
       routes: ['/'],
       // crawlLinks: true,
       // ignore: ['/gate/**']
+    },
+    hooks: {
+      'prerender:generate'(route) {
+        // If Nitro is generating an automatic fallback file, skip it entirely
+        if (route.route === '/index.html' || route.route === '/200.html' || route.route === '/404.html') {
+          route.skip = true
+        }
+      }
     }
   }
 })
