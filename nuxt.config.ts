@@ -24,7 +24,7 @@ export default defineNuxtConfig({
   },
 
   security: {
-    enabled: false, //process.env.NODE_ENV === 'production',
+    enabled: process.env.NODE_ENV === 'production',
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],
@@ -91,11 +91,11 @@ export default defineNuxtConfig({
       sourcemap: false
     }
   },
-  nitro: {
-    prerender: {
-      routes: ['/'],
-      crawlLinks: true,
-      ignore: ['/gate/**']
-    }
-  }
+  // nitro: {
+  //   prerender: {
+  //     routes: ['/'],
+  //     crawlLinks: true,
+  //     ignore: ['/gate/**']
+  //   }
+  // }
 })
