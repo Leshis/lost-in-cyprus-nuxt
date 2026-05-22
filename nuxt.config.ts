@@ -90,12 +90,5 @@ export default defineNuxtConfig({
     build: {
       sourcemap: false
     }
-  },
-  routeRules: {
-    // 1. Force the home page to be statically pre-rendered at build time
-    '/': { prerender: true },
-    
-    // 2. Explicitly leave /gate out of it so it renders exclusively at request-time
-    '/gate/**': { ssr: true }
   }
 })
