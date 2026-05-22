@@ -1,20 +1,37 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  // Skip auth check on server — Supabase session isn't available via SSR here.
-  // The middleware will re-run client-side after hydration.
-  if (import.meta.server) return  // ← add this
+  console.log('[gate] middleware fired', { 
+    path: to.fullPath, 
+    isServer: import.meta.server, 
+    isClient: import.meta.client 
+  })
+
+  if (import.meta.server) {
+    console.log('[gate] server side - skipping')
+    return
+  }
 
   const user = useSupabaseUser()
-  if (user.value) return
+  console.log('[gate] user.value:', user.value)
+
+  if (user.value) {
+    console.log('[gate] user found reactively - allowing')
+    return
+  }
 
   if (import.meta.client) {
     const client = useSupabaseClient()
     try {
       const { data, error } = await client.auth.getUser()
-      if (!error && data?.user) return
+      console.log('[gate] getUser result:', { data, error })
+      if (!error && data?.user) {
+        console.log('[gate] session verified - allowing')
+        return
+      }
     } catch (err) {
-      console.error('Gate Middleware Auth Error:', err)
+      console.error('[gate] auth error:', err)
     }
   }
 
+  console.log('[gate] no auth found - redirecting to login')
   return navigateTo(`/login?redirectTo=${encodeURIComponent(to.fullPath)}`)
 })
