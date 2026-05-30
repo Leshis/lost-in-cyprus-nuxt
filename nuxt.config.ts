@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
   image: {
+    provider: 'ipx', 
     domains: process.env.SUPABASE_URL ? [new URL(process.env.SUPABASE_URL).hostname] : [],
     alias: {
       supabase: process.env.SUPABASE_URL ? process.env.SUPABASE_URL + '/storage/v1/object/public/articles' : ''
@@ -85,22 +86,19 @@ export default defineNuxtConfig({
       ],
     },
   },
+  // nuxt.config.ts
+routeRules: {
+  '/': { prerender: true },
+  '/about': { prerender: true },
+  '/contact': { prerender: true },
+  '/privacy-policy': { prerender: true },
+  '/articles/**': { prerender: true },
+  '/login': { prerender: false, ssr: false },
+  '/gate/**': { prerender: false, ssr: false },  // client-side only, auth checked on client
+},
   vite: {
     build: {
       sourcemap: false
-    }
-  },
-  nitro: {
-    preset: 'netlify',
-    prerender: {
-      crawlLinks: true,
-      failOnError: false, 
-      routes: [
-        '/',
-        '/about',
-        '/privacy-policy',
-        '/contact'
-      ]
     }
   }
 })
