@@ -115,7 +115,10 @@ import { useMapStore } from '@/stores/mapStore'
 import CyprusMap from '@/components/CyprusMap.vue'
 import type { Article } from '~/types/database.types'
 
-definePageMeta({ key: 'home' })
+definePageMeta({
+  prerender: true,
+  key: 'home'
+})
 
 type ArticleCard = Pick<Article,
   'id' | 'title' | 'slug' | 'category' | 'district' | 'image_url' | 'alt_text'

@@ -20,7 +20,15 @@
       <div v-if="searchOpen && searchQuery" class="search-dropdown">
         <template v-if="searchResults.length > 0">
           <div v-for="result in searchResults" :key="result.id" class="search-result" @click="navigate(result)">
-            <img v-if="result.image_url" :src="getImageUrl(result.image_url)" :alt="result.title" class="result-thumb" />
+            <NuxtImg
+  v-if="result.image_url"
+  :src="`supabase/${result.image_url}`"
+  :alt="result.title"
+  class="result-thumb"
+  width="48"
+  height="48"
+  loading="lazy"
+/>
             <div v-else class="result-thumb result-thumb--placeholder" />
             <div class="result-text">
               <span class="result-title">{{ result.title }}</span>
@@ -43,7 +51,15 @@
       <div v-if="searchResults.length > 0" class="results-dropdown">
         <div v-for="result in searchResults" :key="result.id" class="result-item" @click="navigate(result)">
           <div class="result-thumb-wrapper">
-            <img :src="getImageUrl(result.image_url)" class="result-thumb" alt="Thumbnail" />
+            <NuxtImg
+  v-if="result.image_url"
+  :src="`supabase/${result.image_url}`"
+  :alt="result.title"
+  class="result-thumb"
+  width="48"
+  height="48"
+  loading="lazy"
+/>
           </div>
           <span class="result-title">{{ result.title }}</span>
         </div>
@@ -56,8 +72,7 @@
 <script setup>
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-const supabase = useSupabaseClient()
-import { getImageUrl } from '@/utils/supabaseHelpers';
+const supabase = useSupabaseClient();
 
 const props = defineProps({
   variant: { type: String, default: 'inline' }
