@@ -86,6 +86,16 @@ export default defineNuxtConfig({
       ],
     },
   },
+  // nuxt.config.ts
+routeRules: {
+  '/': { prerender: true },
+  '/about': { prerender: true },
+  '/contact': { prerender: true },
+  '/privacy-policy': { prerender: true },
+  '/articles/**': { prerender: true },
+  '/login': { prerender: false, ssr: false },
+  '/gate/**': { prerender: false, ssr: false },  // client-side only, auth checked on client
+},
   vite: {
     build: {
       sourcemap: false
